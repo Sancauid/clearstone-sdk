@@ -19,6 +19,7 @@ from clearstone.utils.validator import PolicyValidator, PolicyValidationError
 from clearstone.utils.debugging import PolicyDebugger
 from clearstone.utils.audit import AuditTrail
 from clearstone.utils.metrics import PolicyMetrics
+from clearstone.utils.intervention import InterventionClient
 from clearstone import policies
 
 __version__ = "0.1.0"
@@ -44,5 +45,6 @@ __all__ = [
     "PolicyDebugger",
     "AuditTrail",
     "PolicyMetrics",
+    "InterventionClient",
     "policies",
 ]

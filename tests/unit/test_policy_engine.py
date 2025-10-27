@@ -86,7 +86,7 @@ def test_engine_block_is_a_veto():
 def test_engine_returns_first_non_allow_decision():
     """Test that the engine returns the highest-priority non-ALLOW decision."""
     @Policy(name="p1_pause", priority=100)
-    def p1(context): return PAUSE
+    def p1(context): return PAUSE("Test pause")
 
     @Policy(name="p2_alert", priority=50)
     def p2(context): return ALERT

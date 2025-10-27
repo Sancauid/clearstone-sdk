@@ -3,6 +3,7 @@
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import Dict, Any, List
+import uuid
 
 class ActionType(Enum):
     """
@@ -29,9 +30,12 @@ class Decision:
     def is_block(self) -> bool:
         """Helper method to check if this is a blocking decision."""
         return self.action == ActionType.BLOCK
+    
+    def is_pause(self) -> bool:
+        """Helper method to check if this is a pause decision."""
+        return self.action == ActionType.PAUSE
 
 ALLOW = Decision(ActionType.ALLOW)
-PAUSE = Decision(ActionType.PAUSE)
 ALERT = Decision(ActionType.ALERT)
 SKIP = Decision(ActionType.SKIP)
 
@@ -51,3 +55,14 @@ def REDACT(reason: str, fields: List[str], **metadata) -> Decision:
         raise ValueError("REDACT decision requires a non-empty list of fields.")
     metadata['fields_to_redact'] = fields
     return Decision(action=ActionType.REDACT, reason=reason, metadata=metadata)
+
+def PAUSE(reason: str, intervention_id: str = None, **metadata) -> Decision:
+    """
+    Creates a PAUSE decision, signaling a need for human intervention.
+    An intervention_id is automatically generated if not provided.
+    """
+    if not reason or not isinstance(reason, str):
+        raise ValueError("PAUSE decision requires a non-empty string reason.")
+    
+    metadata['intervention_id'] = intervention_id or f"intervention_{uuid.uuid4().hex}"
+    return Decision(action=ActionType.PAUSE, reason=reason, metadata=metadata)

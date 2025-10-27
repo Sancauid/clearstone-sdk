@@ -1,54 +1,64 @@
+# pyproject.toml
+
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+# Simplified build system. We will not use setuptools_scm for now.
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "clearstone-sdk"
 version = "0.1.0"
-description = "Checkpoint-based debugging for multi-agent AI systems."
-readme = "README.md"
-requires-python = ">=3.10"
-license = {file = "LICENSE"}
 authors = [
-    {name = "Pablo San Francisco", email = "pablo@clearstone.dev"},
+    { name = "Pablo San Francisco", email = "pablo@clearstone.dev" },
 ]
-keywords = ["ai", "multi-agent", "policy", "checkpoint", "debugging"]
+# Updated description to accurately reflect v0.1 features.
+description = "Production-Grade Policy-as-Code Governance for AI Agent Systems."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+keywords = ["ai", "langchain", "agent", "governance", "policy", "safety", "guardrails"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
+# CRITICAL FIX: Added 'click' for the CLI.
 dependencies = [
     "langchain>=0.1.0",
     "pydantic>=2.0",
+    "click>=8.0",
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/your-repo/clearstone-sdk"
+"Bug Tracker" = "https://github.com/your-repo/clearstone-sdk/issues"
+
+[project.scripts]
+# Ensure this path matches your file structure, e.g., clearstone/cli/main.py -> cli.main:cli
+clearstone = "clearstone.cli.main:cli"
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21",
+    # We will add black and ruff here later
 ]
 
-[project.scripts]
-clearstone = "clearstone.cli.cli:cli"
+# BEST PRACTICE: Use automatic package finding instead of a manual list.
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["clearstone*"]
+exclude = ["tests*"]
 
-[tool.setuptools]
-packages = ["clearstone", "clearstone.core", "clearstone.tracing", "clearstone.checkpointing", 
-            "clearstone.integrations", "clearstone.integrations.langchain", 
-            "clearstone.integrations.future", "clearstone.cli", "clearstone.cli.commands", "clearstone.utils"]
-
-[tool.setuptools.package-data]
-"*" = ["*.txt", "*.md"]
-
+# The pytest configuration is excellent, no changes needed.
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
+python_files = "test_*.py"
 asyncio_mode = "auto"
-

@@ -26,6 +26,7 @@ Clearstone provides the tools to manage these risks with a simple, developer-fir
 *   ✅ **Declarative Policy-as-Code:** Write policies as simple Python functions using the `@Policy` decorator. No YAML or complex DSLs.
 *   ✅ **Seamless LangChain Integration:** Drop the `PolicyCallbackHandler` into any LangChain agent to enforce policies at runtime.
 *   ✅ **Rich Pre-Built Policy Library:** Get started in minutes with 15+ production-ready policies for cost control, RBAC, PII redaction, security alerts, and more.
+*   ✅ **Human-in-the-Loop Controls:** Pause agent execution for manual approval with the `PAUSE` action and `InterventionClient` for high-stakes decisions.
 *   ✅ **Pre-Deploy Validation:** Catch buggy, slow, or non-deterministic policies *before* they reach production with the `PolicyValidator`.
 *   ✅ **Line-by-Line Debugging:** Understand exactly why a policy made a decision with the `PolicyDebugger`'s execution trace.
 *   ✅ **Performance Metrics:** Track policy execution times, identify bottlenecks, and analyze decision patterns with `PolicyMetrics`.
@@ -194,7 +195,59 @@ for policy_name, stats in slowest:
 top_blockers = metrics.get_top_blocking_policies(top_n=5)
 ```
 
-#### 5. Auditing and Exporting
+#### 5. Human-in-the-Loop Interventions
+Pause agent execution for manual approval on high-stakes operations like financial transactions or destructive actions.
+```python
+import dataclasses
+from clearstone import (
+  Policy, PolicyEngine, create_context, context_scope,
+  ALLOW, PAUSE, InterventionClient
+)
+from clearstone.integrations.langchain import PolicyCallbackHandler, PolicyPauseError
+
+@Policy(name="require_approval_for_large_spend", priority=100)
+def approval_policy(context):
+  amount = context.metadata.get("amount", 0)
+  is_approved = context.metadata.get("is_approved", False)
+  
+  if amount > 1000 and not is_approved:
+    return PAUSE(f"Transaction of ${amount} requires manual approval.")
+  
+  return ALLOW
+
+def run_transaction(engine, context):
+  handler = PolicyCallbackHandler(engine)
+  
+  try:
+    with context_scope(context):
+      handler.on_tool_start(serialized={"name": "execute_payment"}, input_str="")
+    print("✅ Transaction successful")
+    return True
+  
+  except PolicyPauseError as e:
+    print(f"⏸️ Transaction paused: {e.decision.reason}")
+    
+    intervention_client = InterventionClient()
+    intervention_client.request_intervention(e.decision)
+    intervention_id = e.decision.metadata.get("intervention_id")
+    
+    if intervention_client.wait_for_approval(intervention_id):
+      # User approved - retry with approval flag
+      approved_context = dataclasses.replace(
+        context, 
+        metadata={**context.metadata, "is_approved": True}
+      )
+      return run_transaction(engine, approved_context)
+    else:
+      print("❌ Transaction rejected by user")
+      return False
+
+engine = PolicyEngine()
+ctx = create_context("user-1", "finance-agent", amount=2500)
+run_transaction(engine, ctx)
+```
+
+#### 6. Auditing and Exporting
 The `PolicyEngine` automatically captures a detailed audit trail. You can analyze it or export it for compliance.
 ```python
 from clearstone import AuditTrail

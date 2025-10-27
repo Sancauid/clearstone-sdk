@@ -250,7 +250,7 @@ def pause_before_write_policy(context: PolicyContext) -> Decision:
     require_pause = context.metadata.get("require_pause_for", [])
 
     if any(action in tool_name for action in require_pause):
-        return PAUSE
+        return PAUSE(f"Manual review required for write operation: '{tool_name}'")
 
     return ALLOW
 
@@ -402,7 +402,7 @@ def require_approval_for_high_cost_policy(context: PolicyContext) -> Decision:
     threshold = context.metadata.get("high_cost_threshold", 10.0)
 
     if cost > threshold:
-        return PAUSE
+        return PAUSE(f"High cost operation requires approval: ${cost:.2f} > ${threshold:.2f}")
 
     return ALLOW
 

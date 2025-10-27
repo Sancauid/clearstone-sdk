@@ -64,7 +64,7 @@ def test_handler_pauses_on_pause_decision():
     """A PAUSE decision should raise a PolicyPauseError."""
     @Policy(name="pause_on_tool")
     def pause_policy(context: PolicyContext):
-        return PAUSE
+        return PAUSE("Manual approval required for deployment.")
 
     engine = PolicyEngine()
     handler = PolicyCallbackHandler(engine)
