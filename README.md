@@ -54,6 +54,14 @@ Clearstone provides the tools to manage these risks with declarative Policy-as-C
 *   ✅ **Trace-Level Validation:** Assert on complete execution flows, not just individual operations or outputs.
 *   ✅ **Comprehensive Reporting:** Track block rates, decision distributions, and identify problematic traces.
 
+### Time-Travel Debugging
+*   ✅ **Checkpoint System:** Capture complete agent state at any point in execution history.
+*   ✅ **Agent Rehydration:** Dynamically restore agents from checkpoints with full state preservation.
+*   ✅ **Deterministic Replay:** Mock non-deterministic functions (time, random) for reproducible debugging sessions.
+*   ✅ **Interactive Debugging:** Drop into pdb at any historical execution point with full context.
+*   ✅ **Hybrid Serialization:** JSON metadata with pickle state for human-readable yet high-fidelity checkpoints.
+*   ✅ **Upstream Span Tracking:** Automatically capture parent span hierarchy for complete execution context.
+
 ## Installation
 
 The SDK requires Python 3.10+.
@@ -491,6 +499,113 @@ def test_research_agent_uses_search_correctly(tmp_path):
 - 🔄 **Regression Prevention:** Catch behavioral changes before deployment
 - 🧪 **CI/CD Ready:** Seamlessly integrates with pytest workflows
 - 📈 **Impact Analysis:** Understand policy changes with detailed metrics
+
+## Time-Travel Debugging
+
+Debug AI agents by traveling back to any point in their execution history. Clearstone's time-travel debugging captures complete agent state snapshots and allows you to replay and debug from those exact moments.
+
+#### Quick Start: Create and Load a Checkpoint
+
+```python
+from clearstone.debugging import CheckpointManager, ReplayEngine
+from clearstone.observability import TracerProvider
+
+provider = TracerProvider(db_path="traces.db")
+tracer = provider.get_tracer("my_agent", version="1.0")
+
+with tracer.span("agent_workflow") as root_span:
+  trace_id = root_span.trace_id
+  
+  with tracer.span("step_1") as span1:
+    pass
+  
+  with tracer.span("step_2") as span2:
+    span_id = span2.span_id
+
+provider.shutdown()
+
+trace = provider.trace_store.get_trace(trace_id)
+
+manager = CheckpointManager()
+checkpoint = manager.create_checkpoint(agent, trace, span_id=span_id)
+
+engine = ReplayEngine(checkpoint)
+engine.start_debugging_session("run_next_step", input_data)
+```
+
+#### Key Capabilities
+
+**Checkpoint Creation**
+```python
+from clearstone.debugging import CheckpointManager
+
+manager = CheckpointManager(checkpoint_dir=".checkpoints")
+
+checkpoint = manager.create_checkpoint(
+  agent=my_agent,
+  trace=execution_trace,
+  span_id="span_xyz"
+)
+```
+
+**Agent Rehydration**
+```python
+from clearstone.debugging import ReplayEngine
+
+checkpoint = manager.load_checkpoint("t1_ckpt_abc123.ckpt")
+
+engine = ReplayEngine(checkpoint)
+```
+
+**Interactive Debugging Session**
+```python
+engine.start_debugging_session(
+  function_to_replay="process_input",
+  *args,
+  **kwargs
+)
+```
+
+**Deterministic Replay**
+
+The `DeterministicExecutionContext` automatically mocks non-deterministic functions to ensure reproducible debugging:
+- Time functions (`time.time`)
+- Random number generation (`random.random`)
+- LLM responses (replayed from trace)
+- Tool outputs (replayed from trace)
+
+**Checkpoint Serialization**
+
+Checkpoints use a hybrid serialization approach:
+- Metadata: JSON (human-readable, version info, timestamps)
+- Agent state: Pickle (high-fidelity, preserves complex objects)
+- Trace context: Full upstream span hierarchy included
+
+**Key Benefits:**
+- 🕰️ **Time Travel:** Jump to any point in agent execution history
+- 🔍 **Full Context:** Complete state + parent span hierarchy
+- 🎯 **Deterministic:** Reproducible replay with mocked externals
+- 🐛 **Interactive:** Drop into pdb with real agent state
+- 💾 **Portable:** Save checkpoints to disk, share with team
+- 🔄 **Rehydration:** Dynamically restore any agent class
+
+#### Agent Requirements
+
+For agents to be checkpointable, they must implement:
+
+```python
+class MyAgent:
+  def get_state(self):
+    """Return a dictionary of all state to preserve."""
+    return {"memory": self.memory, "config": self.config}
+  
+  def load_state(self, state):
+    """Restore agent from a state dictionary."""
+    self.memory = state["memory"]
+    self.config = state["config"]
+```
+
+For simple agents, Clearstone will automatically capture `__dict__` if these methods aren't provided.
 
 ## Command-Line Interface (CLI)
 
