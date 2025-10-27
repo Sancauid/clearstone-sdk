@@ -41,7 +41,9 @@ class PolicyMetrics:
         summary_data = {}
         for name, data in self.stats.items():
             eval_count = data["eval_count"]
-            avg_latency = (data["total_latency_ms"] / eval_count) if eval_count > 0 else 0
+            avg_latency = (
+                (data["total_latency_ms"] / eval_count) if eval_count > 0 else 0
+            )
             summary_data[name] = {
                 "eval_count": eval_count,
                 "block_count": data["block_count"],
@@ -54,9 +56,7 @@ class PolicyMetrics:
         """Returns the top N policies sorted by average latency."""
         summary = self.summary()
         sorted_policies = sorted(
-            summary.items(),
-            key=lambda item: item[1]["avg_latency_ms"],
-            reverse=True
+            summary.items(), key=lambda item: item[1]["avg_latency_ms"], reverse=True
         )
         return sorted_policies[:top_n]
 
@@ -64,9 +64,6 @@ class PolicyMetrics:
         """Returns the top N policies that blocked most often."""
         summary = self.summary()
         sorted_policies = sorted(
-            summary.items(),
-            key=lambda item: item[1]["block_count"],
-            reverse=True
+            summary.items(), key=lambda item: item[1]["block_count"], reverse=True
         )
         return sorted_policies[:top_n]
-

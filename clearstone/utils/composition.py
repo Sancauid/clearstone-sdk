@@ -8,10 +8,12 @@ from clearstone.core.actions import ALLOW, BLOCK, ActionType, Decision
 from clearstone.core.context import PolicyContext
 
 
-def compose_and(*policies: Callable[[PolicyContext], Decision]) -> Callable[[PolicyContext], Decision]:
+def compose_and(
+    *policies: Callable[[PolicyContext], Decision]
+) -> Callable[[PolicyContext], Decision]:
     """
     Creates a new composite policy where ALL underlying policies must ALLOW an action.
-    
+
     This is a fail-safe composition. The moment any policy returns a BLOCK, the
     entire composition immediately returns that BLOCK decision and stops further evaluation.
 
@@ -23,7 +25,7 @@ def compose_and(*policies: Callable[[PolicyContext], Decision]) -> Callable[[Pol
 
     Example:
         combined = compose_and(token_limit_policy, rbac_policy, business_hours_policy)
-        
+
         @Policy(name="combined_policy", priority=100)
         def my_policy(context):
             return combined(context)
@@ -36,15 +38,17 @@ def compose_and(*policies: Callable[[PolicyContext], Decision]) -> Callable[[Pol
             if decision.action == ActionType.BLOCK:
                 return decision
         return ALLOW
-    
+
     composed_and_policy.__name__ = f"composed_and({policy_names})"
     return composed_and_policy
 
 
-def compose_or(*policies: Callable[[PolicyContext], Decision]) -> Callable[[PolicyContext], Decision]:
+def compose_or(
+    *policies: Callable[[PolicyContext], Decision]
+) -> Callable[[PolicyContext], Decision]:
     """
     Creates a new composite policy where ANY of the underlying policies can ALLOW an action.
-    
+
     This composition returns the decision of the first policy that does not BLOCK.
     If all policies return BLOCK, it returns the decision of the first policy.
 
@@ -56,7 +60,7 @@ def compose_or(*policies: Callable[[PolicyContext], Decision]) -> Callable[[Poli
 
     Example:
         either = compose_or(admin_access_policy, emergency_override_policy)
-        
+
         @Policy(name="flexible_access", priority=90)
         def my_policy(context):
             return either(context)
@@ -73,9 +77,8 @@ def compose_or(*policies: Callable[[PolicyContext], Decision]) -> Callable[[Poli
             if decision.action != ActionType.BLOCK:
                 return decision
             block_decisions.append(decision)
-        
+
         return block_decisions[0]
-    
+
     composed_or_policy.__name__ = f"composed_or({policy_names})"
     return composed_or_policy
-

@@ -12,7 +12,7 @@ from clearstone import (
     create_context,
     context_scope,
     ALLOW,
-    BLOCK
+    BLOCK,
 )
 from clearstone.core.policy import reset_policies
 
@@ -234,7 +234,9 @@ def example_6_audit_analysis():
     print("Analyzing audit entries...")
 
     blocked_by_role = sum(1 for e in entries if "Guest access" in (e["reason"] or ""))
-    blocked_by_amount = sum(1 for e in entries if "exceeds limit" in (e["reason"] or ""))
+    blocked_by_amount = sum(
+        1 for e in entries if "exceeds limit" in (e["reason"] or "")
+    )
 
     print(f"  Total decisions: {len(entries)}")
     print(f"  Blocked by role: {blocked_by_role}")
@@ -242,7 +244,9 @@ def example_6_audit_analysis():
 
     print("\nLast 3 decisions:")
     for entry in audit.get_entries(limit=3):
-        print(f"  - {entry['policy_name']}: {entry['decision']} ({entry['reason'] or 'N/A'})")
+        print(
+            f"  - {entry['policy_name']}: {entry['decision']} ({entry['reason'] or 'N/A'})"
+        )
 
 
 if __name__ == "__main__":
@@ -264,4 +268,3 @@ if __name__ == "__main__":
     print("- Export to JSON or CSV for analysis and compliance")
     print("- Share audit trails across multiple engines")
     print("- Analyze entries to understand policy behavior")
-

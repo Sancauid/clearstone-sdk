@@ -9,14 +9,17 @@ from clearstone.core.actions import Decision, ALLOW, BLOCK, ActionType
 from clearstone.utils.audit import AuditTrail
 from clearstone.utils.metrics import PolicyMetrics
 
-_policy_registry: List['PolicyInfo'] = []
+_policy_registry: List["PolicyInfo"] = []
+
 
 @dataclass(frozen=True)
 class PolicyInfo:
     """Metadata about a registered policy function."""
+
     name: str
     priority: int
     func: Callable
+
 
 def Policy(name: str, priority: int = 0) -> Callable:
     """
@@ -44,15 +47,18 @@ def Policy(name: str, priority: int = 0) -> Callable:
                 f"Policy function '{func.__name__}' must have the signature: "
                 f"def {func.__name__}(context: PolicyContext) -> Decision. Got: {sig}"
             )
-        
+
         info = PolicyInfo(name=name, priority=priority, func=func)
         _policy_registry.append(info)
         return func
+
     return decorator
+
 
 def get_policies() -> List[PolicyInfo]:
     """Returns all registered policies, sorted by priority (descending)."""
     return sorted(_policy_registry, key=lambda p: p.priority, reverse=True)
+
 
 def reset_policies() -> None:
     """Clears the global policy registry. Primarily for testing."""
@@ -69,7 +75,13 @@ class PolicyEngine:
         audit_trail: Optional AuditTrail instance. If None, creates a new one.
         metrics: Optional PolicyMetrics instance. If None, creates a new one.
     """
-    def __init__(self, policies: Optional[List[PolicyInfo]] = None, audit_trail: Optional[AuditTrail] = None, metrics: Optional[PolicyMetrics] = None):
+
+    def __init__(
+        self,
+        policies: Optional[List[PolicyInfo]] = None,
+        audit_trail: Optional[AuditTrail] = None,
+        metrics: Optional[PolicyMetrics] = None,
+    ):
         if policies is None:
             policies = get_policies()
 
@@ -103,7 +115,7 @@ class PolicyEngine:
 
         for policy_info in self._policies:
             start_time = time.perf_counter()
-            
+
             try:
                 decision = policy_info.func(context)
                 end_time = time.perf_counter()
@@ -115,18 +127,23 @@ class PolicyEngine:
                 if decision.action == ActionType.BLOCK:
                     return decision
 
-                if final_decision.action == ActionType.ALLOW and decision.action not in [ActionType.ALLOW, ActionType.SKIP]:
+                if (
+                    final_decision.action == ActionType.ALLOW
+                    and decision.action not in [ActionType.ALLOW, ActionType.SKIP]
+                ):
                     final_decision = decision
 
             except Exception as e:
                 end_time = time.perf_counter()
                 latency_ms = (end_time - start_time) * 1000
-                
+
                 err_reason = f"Policy '{policy_info.name}' raised an exception: {e}"
                 err_decision = BLOCK(err_reason)
-                
+
                 self.metrics.record(policy_info.name, err_decision, latency_ms)
-                self.audit_trail.record_decision(policy_info.name, context, err_decision, error=str(e))
+                self.audit_trail.record_decision(
+                    policy_info.name, context, err_decision, error=str(e)
+                )
                 return err_decision
 
         return final_decision

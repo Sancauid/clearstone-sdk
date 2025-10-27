@@ -21,9 +21,7 @@ class PolicyDebugger:
     """
 
     def trace_evaluation(
-        self,
-        policy: Callable[[PolicyContext], Decision],
-        context: PolicyContext
+        self, policy: Callable[[PolicyContext], Decision], context: PolicyContext
     ) -> Tuple[Decision, List[Dict[str, Any]]]:
         """
         Executes a policy and records each line of code that runs, along with
@@ -54,12 +52,18 @@ class PolicyDebugger:
             lines, start_line, end_line = [], -1, -1
 
         def tracer(frame, event, arg):
-            if event == 'line' and start_line <= frame.f_lineno < end_line:
-                trace_events.append({
-                    'line_no': frame.f_lineno,
-                    'line_text': lines[frame.f_lineno - start_line].strip(),
-                    'locals': {k: repr(v) for k, v in frame.f_locals.items() if not k.startswith('__')}
-                })
+            if event == "line" and start_line <= frame.f_lineno < end_line:
+                trace_events.append(
+                    {
+                        "line_no": frame.f_lineno,
+                        "line_text": lines[frame.f_lineno - start_line].strip(),
+                        "locals": {
+                            k: repr(v)
+                            for k, v in frame.f_locals.items()
+                            if not k.startswith("__")
+                        },
+                    }
+                )
             return tracer
 
         original_trace = sys.gettrace()
@@ -72,10 +76,7 @@ class PolicyDebugger:
         return final_decision, trace_events
 
     def format_trace(
-        self,
-        policy: Callable,
-        decision: Decision,
-        trace: List[Dict[str, Any]]
+        self, policy: Callable, decision: Decision, trace: List[Dict[str, Any]]
     ) -> str:
         """
         Formats the output of a trace_evaluation into a human-readable string.
@@ -101,4 +102,3 @@ class PolicyDebugger:
         for event in trace:
             output += f"  L{event['line_no']:<3} | {event['line_text']:<60} | Locals: {event['locals']}\n"
         return output
-

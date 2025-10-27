@@ -1,2 +1,1 @@
 # clearstone/checkpointing/checkpoint.py
-

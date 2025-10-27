@@ -8,13 +8,17 @@ from langchain_core.callbacks.manager import CallbackManager
 from clearstone.core.actions import ALLOW, BLOCK, ALERT, Decision, ActionType
 from clearstone.core.context import create_context, context_scope
 from clearstone.core.policy import Policy, PolicyEngine, reset_policies
-from clearstone.integrations.langchain.callbacks import PolicyCallbackHandler, PolicyViolationError
+from clearstone.integrations.langchain.callbacks import (
+    PolicyCallbackHandler,
+    PolicyViolationError,
+)
 
 # ==============================================================================
 # 1. DEFINE YOUR POLICIES
 # These functions are automatically discovered by the PolicyEngine.
 # ==============================================================================
 reset_policies()
+
 
 @Policy(name="security_block_dangerous_tools_for_guests", priority=100)
 def block_dangerous_tools(context):
@@ -27,10 +31,13 @@ def block_dangerous_tools(context):
 
     # This is the core policy logic
     if role == "guest" and tool_name == "delete_files":
-        return BLOCK(f"Role '{role}' is not authorized to use the dangerous tool '{tool_name}'.")
-    
+        return BLOCK(
+            f"Role '{role}' is not authorized to use the dangerous tool '{tool_name}'."
+        )
+
     # If the condition isn't met, this policy allows the action.
     return ALLOW
+
 
 @Policy(name="monitoring_alert_on_large_text", priority=50)
 def alert_on_large_text(context):
@@ -39,11 +46,15 @@ def alert_on_large_text(context):
     It creates an ALERT if a tool is called with a very large text input.
     """
     tool_input = context.metadata.get("tool_input", "")
-    
+
     if context.metadata.get("event_type") == "on_tool_start" and len(tool_input) > 100:
-        return Decision(action=ActionType.ALERT, reason=f"Large input detected ({len(tool_input)} characters).")
+        return Decision(
+            action=ActionType.ALERT,
+            reason=f"Large input detected ({len(tool_input)} characters).",
+        )
 
     return ALLOW
+
 
 # ==============================================================================
 # 2. SETUP THE ENGINE AND A (SIMULATED) LANGCHAIN AGENT
@@ -58,18 +69,19 @@ except ValueError as e:
     print(f"Error initializing PolicyEngine: {e}")
     sys.exit(1)
 
+
 def run_simulated_agent_tool(tool_name: str, tool_input: str, callbacks: List[Any]):
     """
     This function simulates a LangChain agent executing a tool.
     It manually triggers the on_tool_start event to run our policies.
     """
     print(f"Agent is attempting to run tool '{tool_name}'...")
-    
+
     try:
         # Call the handler directly to properly catch exceptions in our test
         for handler in callbacks:
             handler.on_tool_start(serialized={"name": tool_name}, input_str=tool_input)
-        
+
         # If no exception was raised, the tool execution is allowed to proceed.
         print(f"✅ SUCCESS: Policy check passed. Executing tool '{tool_name}'.\n")
 
@@ -79,6 +91,7 @@ def run_simulated_agent_tool(tool_name: str, tool_input: str, callbacks: List[An
     except Exception as e:
         # Catch any other unexpected errors.
         print(f"🔥 UNEXPECTED ERROR: {e}\n")
+
 
 # ==============================================================================
 # 3. RUN YOUR SCENARIOS
@@ -95,14 +108,14 @@ if __name__ == "__main__":
         user_id="user-guest-789",
         agent_id="file-manager-agent",
         session_id="session-alpha",
-        role="guest"  # The critical piece of metadata for our policy
+        role="guest",  # The critical piece of metadata for our policy
     )
     # The `with context_scope(...)` block makes the context available to the handler
     with context_scope(guest_context):
         run_simulated_agent_tool(
             tool_name="delete_files",
             tool_input="/path/to/important/data",
-            callbacks=[POLICY_HANDLER]
+            callbacks=[POLICY_HANDLER],
         )
 
     # --- SCENARIO 2: AN ADMIN USES A TOOL WITH A VERY LARGE INPUT ---
@@ -114,14 +127,17 @@ if __name__ == "__main__":
         user_id="user-admin-123",
         agent_id="research-agent",
         session_id="session-beta",
-        role="admin"
+        role="admin",
     )
-    large_text = "This is a very long string designed to be over 100 characters to trigger our monitoring policy..." * 3
+    large_text = (
+        "This is a very long string designed to be over 100 characters to trigger our monitoring policy..."
+        * 3
+    )
     with context_scope(admin_context):
         run_simulated_agent_tool(
             tool_name="summarize_text",
             tool_input=large_text,
-            callbacks=[POLICY_HANDLER]
+            callbacks=[POLICY_HANDLER],
         )
 
     # --- 4. INSPECT THE AUDIT TRAIL ---
@@ -129,4 +145,6 @@ if __name__ == "__main__":
     # The audit trail contains a record of every single policy evaluation
     audit_trail = POLICY_ENGINE.get_audit_trail()
     for i, entry in enumerate(audit_trail):
-        print(f"{i+1}. Policy '{entry['policy_name']}' ran for user '{entry['user_id']}'. Decision: {entry['decision']}.")
+        print(
+            f"{i+1}. Policy '{entry['policy_name']}' ran for user '{entry['user_id']}'. Decision: {entry['decision']}."
+        )

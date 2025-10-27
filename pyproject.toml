@@ -29,7 +29,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
-# CRITICAL FIX: Added 'click' for the CLI.
+
 dependencies = [
     "langchain>=0.1.0",
     "pydantic>=2.0",
@@ -48,7 +48,8 @@ clearstone = "clearstone.cli.main:cli"
 dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21",
-    # We will add black and ruff here later
+    "black>=24.0", 
+    "ruff>=0.1.0",  
 ]
 
 # BEST PRACTICE: Use automatic package finding instead of a manual list.
@@ -62,3 +63,18 @@ exclude = ["tests*"]
 testpaths = ["tests"]
 python_files = "test_*.py"
 asyncio_mode = "auto"
+
+[tool.black]
+# We'll set a standard line length of 88 characters.
+line-length = 88
+target-version = ['py310']
+
+[tool.ruff]
+# Same line length as black to avoid conflicts.
+line-length = 88
+# Specify which rules to enforce. 'E' and 'F' are standard pyflakes/pep8 checks.
+select = ["E", "F", "W", "I"]
+# Ignore the specific "line too long" rule, as black will handle that.
+ignore = ["E501"]
+# Exclude the venv directory from linting.
+exclude = [".venv", "venv"]

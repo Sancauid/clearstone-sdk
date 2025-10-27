@@ -15,6 +15,7 @@ from clearstone.policies import (
     create_security_policies,
 )
 
+
 def example_1_token_limits():
     """Example: Using token limit policy."""
     print("\n=== Example 1: Token Limits ===")
@@ -25,7 +26,7 @@ def example_1_token_limits():
         user_id="user_123",
         agent_id="research_agent",
         token_limit=5000,
-        tokens_used=6000
+        tokens_used=6000,
     )
 
     with context_scope(ctx):
@@ -48,8 +49,8 @@ def example_2_rbac():
         restricted_tools={
             "guest": ["delete_database", "export_data"],
             "user": ["delete_database"],
-            "admin": []
-        }
+            "admin": [],
+        },
     )
 
     with context_scope(ctx):
@@ -65,9 +66,7 @@ def example_3_dangerous_tools():
     engine = PolicyEngine()
 
     ctx = create_context(
-        user_id="user_123",
-        agent_id="data_agent",
-        tool_name="drop_table"
+        user_id="user_123", agent_id="data_agent", tool_name="drop_table"
     )
 
     with context_scope(ctx):
@@ -86,9 +85,7 @@ def example_4_pii_redaction():
         user_id="analyst_user",
         agent_id="data_agent",
         tool_name="fetch_user_data",
-        pii_fields={
-            "fetch_user_data": ["ssn", "credit_card", "email"]
-        }
+        pii_fields={"fetch_user_data": ["ssn", "credit_card", "email"]},
     )
 
     with context_scope(ctx):
@@ -129,9 +126,7 @@ def example_6_combined_policies():
         tokens_used=3000,
         daily_cost_limit=1000.0,
         daily_cost=500.0,
-        pii_fields={
-            "export_sensitive_data": ["ssn", "account_number"]
-        }
+        pii_fields={"export_sensitive_data": ["ssn", "account_number"]},
     )
 
     with context_scope(ctx):
@@ -154,4 +149,3 @@ if __name__ == "__main__":
 
     print("\n" + "=" * 60)
     print("Demo complete!")
-

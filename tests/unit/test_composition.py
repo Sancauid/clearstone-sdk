@@ -66,6 +66,7 @@ class TestComposeAnd:
 
     def test_compose_and_preserves_block_reason(self):
         """The BLOCK reason from the blocking policy should be preserved."""
+
         def custom_block(context):
             return BLOCK("Custom block reason")
 
@@ -130,12 +131,15 @@ class TestComposeOr:
             call_log.append("alert")
             return ALERT
 
-        composed = compose_or(logging_policy_block, logging_policy_allow, logging_policy_alert)
+        composed = compose_or(
+            logging_policy_block, logging_policy_allow, logging_policy_alert
+        )
         composed(create_context("user", "agent"))
         assert call_log == ["block", "allow"], "Should have stopped after allow."
 
     def test_compose_or_returns_first_block_when_all_block(self):
         """When all policies block, return the first block decision."""
+
         def block_1(context):
             return BLOCK("First block")
 
@@ -155,13 +159,14 @@ class TestCompositionIntegration:
         """Test that compositions can be nested."""
         and_composed = compose_and(policy_allow, policy_allow)
         or_composed = compose_or(policy_block, and_composed)
-        
+
         ctx = create_context("user", "agent")
         decision = or_composed(ctx)
         assert decision.action == ActionType.ALLOW
 
     def test_complex_composition_scenario(self):
         """Test a complex real-world-like composition."""
+
         def requires_admin(context):
             if context.metadata.get("role") == "admin":
                 return ALLOW
@@ -182,24 +187,14 @@ class TestCompositionIntegration:
         flexible_access = compose_or(normal_access, emergency_override)
 
         ctx_admin_business_hours = create_context(
-            "user", "agent",
-            role="admin",
-            hour=14
+            "user", "agent", role="admin", hour=14
         )
         assert flexible_access(ctx_admin_business_hours).action == ActionType.ALLOW
 
         ctx_emergency = create_context(
-            "user", "agent",
-            role="guest",
-            hour=22,
-            emergency=True
+            "user", "agent", role="guest", hour=22, emergency=True
         )
         assert flexible_access(ctx_emergency).action == ActionType.ALLOW
 
-        ctx_no_access = create_context(
-            "user", "agent",
-            role="guest",
-            hour=22
-        )
+        ctx_no_access = create_context("user", "agent", role="guest", hour=22)
         assert flexible_access(ctx_no_access).action == ActionType.BLOCK
-

@@ -7,12 +7,14 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 from contextlib import contextmanager
 
+
 @dataclass(frozen=True)
 class PolicyContext:
     """
     Immutable execution context for a policy evaluation. It is propagated via
     contextvars, making it safe for threaded and asynchronous environments.
     """
+
     user_id: str
     agent_id: str
     session_id: str
@@ -22,11 +24,15 @@ class PolicyContext:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def current(cls) -> Optional['PolicyContext']:
+    def current(cls) -> Optional["PolicyContext"]:
         """Retrieves the current context from the context variable."""
         return _policy_context.get()
 
-_policy_context: ContextVar[Optional[PolicyContext]] = ContextVar('policy_context', default=None)
+
+_policy_context: ContextVar[Optional[PolicyContext]] = ContextVar(
+    "policy_context", default=None
+)
+
 
 def get_current_context() -> Optional[PolicyContext]:
     """
@@ -35,12 +41,14 @@ def get_current_context() -> Optional[PolicyContext]:
     """
     return _policy_context.get()
 
+
 def set_current_context(context: PolicyContext) -> None:
     """
     Manually sets the current policy context for the active scope.
     It is often safer to use the `context_scope` context manager.
     """
     _policy_context.set(context)
+
 
 @contextmanager
 def context_scope(context: PolicyContext):
@@ -58,11 +66,9 @@ def context_scope(context: PolicyContext):
     finally:
         _policy_context.reset(token)
 
+
 def create_context(
-    user_id: str,
-    agent_id: str,
-    session_id: Optional[str] = None,
-    **metadata
+    user_id: str, agent_id: str, session_id: Optional[str] = None, **metadata
 ) -> PolicyContext:
     """
     Factory function for conveniently creating a new PolicyContext instance.
@@ -73,5 +79,5 @@ def create_context(
         user_id=user_id,
         agent_id=agent_id,
         session_id=session_id or str(uuid.uuid4()),
-        metadata=metadata
+        metadata=metadata,
     )

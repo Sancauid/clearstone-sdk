@@ -13,7 +13,7 @@ from clearstone import (
     context_scope,
     ALLOW,
     BLOCK,
-    ALERT
+    ALERT,
 )
 from clearstone.core.policy import reset_policies
 import time
@@ -129,11 +129,11 @@ def example_3_track_blocking_patterns():
 
     # Simulate various scenarios
     scenarios = [
-        {"amount": 500, "role": "user", "hour": 14},      # All pass
-        {"amount": 1500, "role": "user", "hour": 14},     # Amount blocks
-        {"amount": 500, "role": "guest", "hour": 14},     # Role blocks
-        {"amount": 500, "role": "user", "hour": 20},      # Time blocks
-        {"amount": 1500, "role": "guest", "hour": 20},    # Amount blocks first
+        {"amount": 500, "role": "user", "hour": 14},  # All pass
+        {"amount": 1500, "role": "user", "hour": 14},  # Amount blocks
+        {"amount": 500, "role": "guest", "hour": 14},  # Role blocks
+        {"amount": 500, "role": "user", "hour": 20},  # Time blocks
+        {"amount": 1500, "role": "guest", "hour": 20},  # Amount blocks first
     ]
 
     print("\nRunning scenarios...")
@@ -141,16 +141,22 @@ def example_3_track_blocking_patterns():
         ctx = create_context("user1", "agent1", metadata=scenario)
         with context_scope(ctx):
             decision = engine.evaluate()
-            status = "✓ ALLOWED" if decision.action.value == "allow" else f"✗ {decision.action.value.upper()}"
+            status = (
+                "✓ ALLOWED"
+                if decision.action.value == "allow"
+                else f"✗ {decision.action.value.upper()}"
+            )
             print(f"  Scenario {i}: {status}")
 
     # Find top blocking policies
     print("\nTop Blocking Policies:")
     top_blockers = metrics.get_top_blocking_policies()
     for policy_name, stats in top_blockers:
-        if stats['block_count'] > 0:
-            block_rate = (stats['block_count'] / stats['eval_count']) * 100
-            print(f"  {policy_name}: {stats['block_count']}/{stats['eval_count']} ({block_rate:.1f}%)")
+        if stats["block_count"] > 0:
+            block_rate = (stats["block_count"] / stats["eval_count"]) * 100
+            print(
+                f"  {policy_name}: {stats['block_count']}/{stats['eval_count']} ({block_rate:.1f}%)"
+            )
 
 
 def example_4_shared_metrics_across_engines():
@@ -175,10 +181,10 @@ def example_4_shared_metrics_across_engines():
     for value in [10, 60, 30]:
         ctx1 = create_context("user1", "engine1", metadata={"value": value})
         ctx2 = create_context("user2", "engine2", metadata={"value": value + 5})
-        
+
         with context_scope(ctx1):
             engine1.evaluate()
-        
+
         with context_scope(ctx2):
             engine2.evaluate()
 
@@ -200,7 +206,7 @@ def example_5_real_time_performance_monitoring():
         # Simulate varying performance
         delay = context.metadata.get("complexity", 1) * 0.001
         time.sleep(delay)
-        
+
         if context.metadata.get("value", 0) > 100:
             return BLOCK("Value too high")
         return ALLOW
@@ -210,31 +216,32 @@ def example_5_real_time_performance_monitoring():
 
     print("\nMonitoring performance over time:")
     complexities = [1, 2, 3, 4, 5]
-    
+
     for complexity in complexities:
-        ctx = create_context("user1", "agent1", metadata={
-            "complexity": complexity,
-            "value": 50
-        })
+        ctx = create_context(
+            "user1", "agent1", metadata={"complexity": complexity, "value": 50}
+        )
         with context_scope(ctx):
             engine.evaluate()
-        
+
         # Get current metrics
         current_stats = metrics.summary()["varying_speed_policy"]
-        print(f"  After {current_stats['eval_count']} evals: "
-              f"Avg latency = {current_stats['avg_latency_ms']:.4f}ms")
+        print(
+            f"  After {current_stats['eval_count']} evals: "
+            f"Avg latency = {current_stats['avg_latency_ms']:.4f}ms"
+        )
 
 
 if __name__ == "__main__":
     print("\nClearstone Policy Metrics Demo")
     print("=" * 60)
-    
+
     example_1_basic_metrics()
     example_2_identify_slow_policies()
     example_3_track_blocking_patterns()
     example_4_shared_metrics_across_engines()
     example_5_real_time_performance_monitoring()
-    
+
     print("\n" + "=" * 60)
     print("Demo complete!")
     print("\nKey Takeaways:")
@@ -243,4 +250,3 @@ if __name__ == "__main__":
     print("- Use get_top_blocking_policies() to analyze blocking behavior")
     print("- Share metrics across engines for unified monitoring")
     print("- Zero-overhead tracking with minimal performance impact")
-

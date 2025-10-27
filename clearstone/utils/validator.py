@@ -14,6 +14,7 @@ from clearstone.core.actions import Decision
 
 class PolicyValidationError(AssertionError):
     """Custom exception for policy validation failures."""
+
     pass
 
 
@@ -42,10 +43,12 @@ class PolicyValidator:
         self._default_context = default_context or create_context(
             user_id="validation_user",
             agent_id="validation_agent",
-            session_id="validation_session"
+            session_id="validation_session",
         )
 
-    def validate_determinism(self, policy: Callable[[PolicyContext], Decision], num_runs: int = 5) -> None:
+    def validate_determinism(
+        self, policy: Callable[[PolicyContext], Decision], num_runs: int = 5
+    ) -> None:
         """
         Checks if a policy returns the same output for the same input.
         This catches policies that rely on non-deterministic functions (e.g., random, datetime.now()).
@@ -78,7 +81,7 @@ class PolicyValidator:
         self,
         policy: Callable[[PolicyContext], Decision],
         max_latency_ms: float = 1.0,
-        num_runs: int = 1000
+        num_runs: int = 1000,
     ) -> None:
         """
         Checks if a policy executes within a given latency budget.
@@ -110,7 +113,9 @@ class PolicyValidator:
                 f"'{type(e).__name__}: {e}'"
             ) from e
 
-    def validate_exception_safety(self, policy: Callable[[PolicyContext], Decision]) -> None:
+    def validate_exception_safety(
+        self, policy: Callable[[PolicyContext], Decision]
+    ) -> None:
         """
         Checks if a policy crashes when given a context with missing metadata.
         A safe policy should handle missing keys gracefully (e.g., using .get() with defaults).
@@ -125,7 +130,9 @@ class PolicyValidator:
         try:
             result = policy(empty_meta_context)
             if not isinstance(result, Decision):
-                raise TypeError(f"Policy '{policy.__name__}' did not return a Decision object.")
+                raise TypeError(
+                    f"Policy '{policy.__name__}' did not return a Decision object."
+                )
         except Exception as e:
             raise PolicyValidationError(
                 f"Policy '{policy.__name__}' is not exception-safe. "
@@ -166,4 +173,3 @@ class PolicyValidator:
             failures.append(str(e))
 
         return failures
-

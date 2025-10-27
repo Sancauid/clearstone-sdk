@@ -30,7 +30,7 @@ class AuditTrail:
         policy_name: str,
         context: PolicyContext,
         decision: Decision,
-        error: str = None
+        error: str = None,
     ):
         """
         Records a single policy evaluation event.
@@ -49,7 +49,7 @@ class AuditTrail:
             "user_id": context.user_id,
             "agent_id": context.agent_id,
             "request_id": context.request_id,
-            "error": error
+            "error": error,
         }
         self._entries.append(entry)
 
@@ -82,14 +82,18 @@ class AuditTrail:
         if total == 0:
             return {"total_decisions": 0, "blocks": 0, "alerts": 0, "block_rate": 0.0}
 
-        blocks = sum(1 for e in self._entries if e["decision"] == ActionType.BLOCK.value)
-        alerts = sum(1 for e in self._entries if e["decision"] == ActionType.ALERT.value)
+        blocks = sum(
+            1 for e in self._entries if e["decision"] == ActionType.BLOCK.value
+        )
+        alerts = sum(
+            1 for e in self._entries if e["decision"] == ActionType.ALERT.value
+        )
 
         return {
             "total_decisions": total,
             "blocks": blocks,
             "alerts": alerts,
-            "block_rate": (blocks / total)
+            "block_rate": (blocks / total),
         }
 
     def to_json(self, filepath: str, **kwargs):
@@ -103,7 +107,7 @@ class AuditTrail:
         Example:
             audit.to_json("audit_log.json", indent=2)
         """
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             json.dump(self._entries, f, indent=2, **kwargs)
 
     def to_csv(self, filepath: str, **kwargs):
@@ -121,8 +125,7 @@ class AuditTrail:
             return
 
         headers = self._entries[0].keys()
-        with open(filepath, 'w', newline='', encoding='utf-8') as f:
+        with open(filepath, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()
             writer.writerows(self._entries)
-

@@ -19,6 +19,7 @@ def good_policy(context):
 
 _call_counter = 0
 
+
 def non_deterministic_policy(context):
     """A policy that uses a counter, making it non-deterministic."""
     global _call_counter
@@ -48,7 +49,9 @@ class TestPolicyValidator:
         """A good policy should pass all validation checks."""
         validator = PolicyValidator()
         failures = validator.run_all_checks(good_policy)
-        assert len(failures) == 0, f"A good policy should have no validation failures. Got: {failures}"
+        assert (
+            len(failures) == 0
+        ), f"A good policy should have no validation failures. Got: {failures}"
 
     def test_validate_determinism_fails(self):
         """The validator should catch non-deterministic policies."""
@@ -85,6 +88,7 @@ class TestPolicyValidator:
 
     def test_run_all_checks_collects_multiple_failures(self):
         """The run_all_checks helper should report all failures found."""
+
         def multi_fail_policy(context):
             if random.random() > 0.5:
                 return BLOCK("Random block")
@@ -100,11 +104,7 @@ class TestPolicyValidator:
 
     def test_custom_validation_context(self):
         """Test that a custom validation context can be provided."""
-        custom_context = create_context(
-            "custom_user",
-            "custom_agent",
-            role="admin"
-        )
+        custom_context = create_context("custom_user", "custom_agent", role="admin")
         validator = PolicyValidator(default_context=custom_context)
 
         decision = good_policy(validator._default_context)
@@ -142,4 +142,3 @@ class TestPolicyValidationError:
         message = "Custom validation error message"
         error = PolicyValidationError(message)
         assert str(error) == message
-

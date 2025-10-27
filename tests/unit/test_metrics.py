@@ -111,4 +111,3 @@ class TestPolicyMetrics:
 
         summary = metrics.summary()
         assert summary["instant_policy"]["avg_latency_ms"] == 0.0
-

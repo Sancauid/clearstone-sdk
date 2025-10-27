@@ -32,7 +32,9 @@ class TestAuditTrail:
         """Test recording decisions with error information."""
         audit = AuditTrail()
         ctx = create_context("user1", "agent1")
-        audit.record_decision("policy1", ctx, BLOCK("error"), error="Exception occurred")
+        audit.record_decision(
+            "policy1", ctx, BLOCK("error"), error="Exception occurred"
+        )
 
         entries = audit.get_entries()
         assert len(entries) == 1
@@ -102,7 +104,7 @@ class TestAuditTrail:
         json_file = tmp_path / "audit.json"
         audit.to_json(str(json_file))
 
-        with open(json_file, 'r') as f:
+        with open(json_file, "r") as f:
             data = json.load(f)
 
         assert isinstance(data, list)
@@ -123,7 +125,7 @@ class TestAuditTrail:
         json_file = tmp_path / "audit.json"
         audit.to_json(str(json_file))
 
-        with open(json_file, 'r') as f:
+        with open(json_file, "r") as f:
             data = json.load(f)
 
         assert len(data) == 3
@@ -139,7 +141,7 @@ class TestAuditTrail:
         csv_file = tmp_path / "audit.csv"
         audit.to_csv(str(csv_file))
 
-        with open(csv_file, 'r') as f:
+        with open(csv_file, "r") as f:
             reader = csv.DictReader(f)
             rows = list(reader)
 
@@ -169,7 +171,7 @@ class TestAuditTrail:
         csv_file = tmp_path / "audit.csv"
         audit.to_csv(str(csv_file))
 
-        with open(csv_file, 'r') as f:
+        with open(csv_file, "r") as f:
             reader = csv.DictReader(f)
             rows = list(reader)
 
@@ -189,4 +191,3 @@ class TestAuditTrail:
         assert entries[0]["agent_id"] == "agent456"
         assert entries[0]["request_id"] == ctx.request_id
         assert "timestamp" in entries[0]
-

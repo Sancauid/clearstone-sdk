@@ -57,8 +57,14 @@ def example_2_complex_branching():
     scenarios = [
         ("Admin user", {"role": "admin", "amount": 5000}),
         ("Unverified user", {"role": "user", "amount": 500, "verified": False}),
-        ("Verified user over limit", {"role": "user", "amount": 2000, "verified": True}),
-        ("Verified user under limit", {"role": "user", "amount": 500, "verified": True}),
+        (
+            "Verified user over limit",
+            {"role": "user", "amount": 2000, "verified": True},
+        ),
+        (
+            "Verified user under limit",
+            {"role": "user", "amount": 500, "verified": True},
+        ),
     ]
 
     for name, metadata in scenarios:
@@ -131,7 +137,7 @@ def example_4_debugging_workflow():
 
         print(f"  Execution path:")
         for event in trace:
-            locals_str = ", ".join([f"{k}={v}" for k, v in event['locals'].items()])
+            locals_str = ", ".join([f"{k}={v}" for k, v in event["locals"].items()])
             print(f"    L{event['line_no']}: {event['line_text']}")
             if locals_str:
                 print(f"        ({locals_str})")
@@ -172,12 +178,16 @@ def example_5_comparing_paths():
     print(f"  Lines executed: {[e['line_no'] for e in trace1]}")
 
     print("\nAdmin without MFA:")
-    decision2, trace2 = debugger.trace_evaluation(access_control_policy, ctx_admin_no_mfa)
+    decision2, trace2 = debugger.trace_evaluation(
+        access_control_policy, ctx_admin_no_mfa
+    )
     print(f"  Decision: {decision2.action.value} - {decision2.reason}")
     print(f"  Lines executed: {[e['line_no'] for e in trace2]}")
 
     print("\nAdmin with MFA:")
-    decision3, trace3 = debugger.trace_evaluation(access_control_policy, ctx_admin_with_mfa)
+    decision3, trace3 = debugger.trace_evaluation(
+        access_control_policy, ctx_admin_with_mfa
+    )
     print(f"  Decision: {decision3.action.value}")
     print(f"  Lines executed: {[e['line_no'] for e in trace3]}")
 
@@ -200,4 +210,3 @@ if __name__ == "__main__":
     print("- Helps understand decision-making logic")
     print("- Perfect for debugging complex branching policies")
     print("- Use format_trace() for human-readable output")
-

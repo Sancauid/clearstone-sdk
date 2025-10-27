@@ -139,7 +139,9 @@ def admin_only_action_policy(context: PolicyContext) -> Decision:
     require_admin = context.metadata.get("require_admin_for", [])
 
     if tool_name in require_admin and user_role != "admin":
-        return BLOCK(f"Admin role required for '{tool_name}'. Current role: '{user_role}'")
+        return BLOCK(
+            f"Admin role required for '{tool_name}'. Current role: '{user_role}'"
+        )
     return ALLOW
 
 
@@ -166,10 +168,7 @@ def redact_pii_policy(context: PolicyContext) -> Decision:
 
     if tool_name in pii_config:
         fields = pii_config[tool_name]
-        return REDACT(
-            reason=f"PII redaction for tool '{tool_name}'",
-            fields=fields
-        )
+        return REDACT(reason=f"PII redaction for tool '{tool_name}'", fields=fields)
     return ALLOW
 
 
@@ -329,7 +328,9 @@ def business_hours_only_policy(context: PolicyContext) -> Decision:
     start, end = business_hours
 
     if not (start <= current_hour < end):
-        return BLOCK(f"Operation only allowed during business hours ({start}:00-{end}:00)")
+        return BLOCK(
+            f"Operation only allowed during business hours ({start}:00-{end}:00)"
+        )
 
     return ALLOW
 
@@ -402,7 +403,9 @@ def require_approval_for_high_cost_policy(context: PolicyContext) -> Decision:
     threshold = context.metadata.get("high_cost_threshold", 10.0)
 
     if cost > threshold:
-        return PAUSE(f"High cost operation requires approval: ${cost:.2f} > ${threshold:.2f}")
+        return PAUSE(
+            f"High cost operation requires approval: ${cost:.2f} > ${threshold:.2f}"
+        )
 
     return ALLOW
 
@@ -512,4 +515,3 @@ def create_data_protection_policies() -> List[Callable]:
         block_pii_tools_policy,
         admin_only_action_policy,
     ]
-

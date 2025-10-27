@@ -17,7 +17,9 @@ class TestCLINewPolicy:
         policy_name = "test_spending_limit"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            result = runner.invoke(cli, ['new-policy', policy_name, '--priority=100', '--dir=my_policies'])
+            result = runner.invoke(
+                cli, ["new-policy", policy_name, "--priority=100", "--dir=my_policies"]
+            )
 
             assert result.exit_code == 0
             assert "Successfully created policy file" in result.output
@@ -35,7 +37,7 @@ class TestCLINewPolicy:
         policy_name = "default_dir_policy"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            result = runner.invoke(cli, ['new-policy', policy_name])
+            result = runner.invoke(cli, ["new-policy", policy_name])
 
             assert result.exit_code == 0
 
@@ -48,9 +50,9 @@ class TestCLINewPolicy:
         policy_name = "duplicate_policy"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            runner.invoke(cli, ['new-policy', policy_name])
+            runner.invoke(cli, ["new-policy", policy_name])
 
-            result = runner.invoke(cli, ['new-policy', policy_name])
+            result = runner.invoke(cli, ["new-policy", policy_name])
 
             assert result.exit_code == 0
             assert "already exists" in result.output
@@ -61,15 +63,24 @@ class TestCLINewPolicy:
         policy_name = "overwritten_policy"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            initial_result = runner.invoke(cli, ['new-policy', policy_name, '--priority=1'])
-            assert "priority=1" in (Path(td) / "policies" / "overwritten_policy_policy.py").read_text()
+            initial_result = runner.invoke(
+                cli, ["new-policy", policy_name, "--priority=1"]
+            )
+            assert (
+                "priority=1"
+                in (Path(td) / "policies" / "overwritten_policy_policy.py").read_text()
+            )
 
-            overwrite_result = runner.invoke(cli, ['new-policy', policy_name, '--priority=99', '--force'])
+            overwrite_result = runner.invoke(
+                cli, ["new-policy", policy_name, "--priority=99", "--force"]
+            )
 
             assert overwrite_result.exit_code == 0
             assert "Successfully created policy file" in overwrite_result.output
 
-            final_content = (Path(td) / "policies" / "overwritten_policy_policy.py").read_text()
+            final_content = (
+                Path(td) / "policies" / "overwritten_policy_policy.py"
+            ).read_text()
             assert "priority=99" in final_content
 
     def test_cli_new_policy_sanitizes_name(self, tmp_path):
@@ -78,7 +89,7 @@ class TestCLINewPolicy:
         policy_name = "my-hyphenated-policy"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            result = runner.invoke(cli, ['new-policy', policy_name])
+            result = runner.invoke(cli, ["new-policy", policy_name])
 
             assert result.exit_code == 0
 
@@ -94,11 +105,15 @@ class TestCLINewPolicy:
         policy_name = "nested_policy"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            result = runner.invoke(cli, ['new-policy', policy_name, '--dir=nested/deep/policies'])
+            result = runner.invoke(
+                cli, ["new-policy", policy_name, "--dir=nested/deep/policies"]
+            )
 
             assert result.exit_code == 0
 
-            expected_file = Path(td) / "nested" / "deep" / "policies" / "nested_policy_policy.py"
+            expected_file = (
+                Path(td) / "nested" / "deep" / "policies" / "nested_policy_policy.py"
+            )
             assert expected_file.exists()
 
     def test_cli_new_policy_default_priority(self, tmp_path):
@@ -107,7 +122,7 @@ class TestCLINewPolicy:
         policy_name = "default_priority"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            result = runner.invoke(cli, ['new-policy', policy_name])
+            result = runner.invoke(cli, ["new-policy", policy_name])
 
             assert result.exit_code == 0
 
@@ -120,7 +135,7 @@ class TestCLINewPolicy:
         policy_name = "template_test"
 
         with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-            result = runner.invoke(cli, ['new-policy', policy_name])
+            result = runner.invoke(cli, ["new-policy", policy_name])
 
             assert result.exit_code == 0
 
@@ -129,4 +144,3 @@ class TestCLINewPolicy:
             assert "from clearstone.core.context import PolicyContext" in content
             assert "[TODO: Describe what this policy does.]" in content
             assert "return ALLOW" in content
-

@@ -35,11 +35,11 @@ class TestPolicyDebugger:
         assert decision.action == ALLOW.action
         assert len(trace) >= 4
 
-        line_texts = [event['line_text'] for event in trace]
+        line_texts = [event["line_text"] for event in trace]
         assert 'role = context.metadata.get("role", "guest")' in line_texts
         assert 'if role == "admin":' in line_texts
-        assert 'if amount > 1000:' in line_texts
-        assert 'return ALLOW' in line_texts
+        assert "if amount > 1000:" in line_texts
+        assert "return ALLOW" in line_texts
         assert 'return BLOCK("Amount exceeds 1000 for non-admins.")' not in line_texts
 
     def test_debugger_trace_evaluation_block_path(self):
@@ -52,8 +52,8 @@ class TestPolicyDebugger:
         assert decision.is_block()
         assert decision.reason == "Amount exceeds 1000 for non-admins."
 
-        line_texts = [event['line_text'] for event in trace]
-        assert 'if amount > 1000:' in line_texts
+        line_texts = [event["line_text"] for event in trace]
+        assert "if amount > 1000:" in line_texts
         assert 'return BLOCK("Amount exceeds 1000 for non-admins.")' in line_texts
 
     def test_debugger_trace_evaluation_admin_path(self):
@@ -65,9 +65,9 @@ class TestPolicyDebugger:
 
         assert decision.action == ALLOW.action
 
-        line_texts = [event['line_text'] for event in trace]
+        line_texts = [event["line_text"] for event in trace]
         assert 'if role == "admin":' in line_texts
-        assert 'return ALLOW' in line_texts
+        assert "return ALLOW" in line_texts
 
     def test_debugger_format_trace(self):
         """Test the human-readable formatting of a trace."""
@@ -94,9 +94,9 @@ class TestPolicyDebugger:
         found_amount_local = False
 
         for event in trace:
-            if 'role' in event['locals']:
+            if "role" in event["locals"]:
                 found_role_local = True
-            if 'amount' in event['locals']:
+            if "amount" in event["locals"]:
                 found_amount_local = True
 
         assert found_role_local, "Should capture 'role' local variable"
@@ -104,6 +104,7 @@ class TestPolicyDebugger:
 
     def test_debugger_with_simple_policy(self):
         """Test debugger with a simple one-line policy."""
+
         def simple_policy(context):
             return ALLOW
 
@@ -125,4 +126,3 @@ class TestPolicyDebugger:
 
         assert "Amount exceeds 1000 for non-admins." in formatted
         assert "Final Decision: BLOCK" in formatted
-

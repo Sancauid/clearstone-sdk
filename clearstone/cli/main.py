@@ -37,10 +37,12 @@ def cli():
 
 
 @cli.command("new-policy")
-@click.argument('name', type=str)
-@click.option('--priority', type=int, default=0, help='Execution priority (higher runs first).')
-@click.option('--dir', default='policies', help='Directory to save the policy file in.')
-@click.option('--force', is_flag=True, help='Overwrite the file if it already exists.')
+@click.argument("name", type=str)
+@click.option(
+    "--priority", type=int, default=0, help="Execution priority (higher runs first)."
+)
+@click.option("--dir", default="policies", help="Directory to save the policy file in.")
+@click.option("--force", is_flag=True, help="Overwrite the file if it already exists.")
 def new_policy(name: str, priority: int, dir: str, force: bool):
     """
     Creates a new policy boilerplate file.
@@ -52,7 +54,7 @@ def new_policy(name: str, priority: int, dir: str, force: bool):
     """
     click.echo(f"Scaffolding new policy '{name}'...")
 
-    function_name = name.lower().replace('-', '_') + "_policy"
+    function_name = name.lower().replace("-", "_") + "_policy"
     file_name = function_name + ".py"
 
     target_dir = Path(dir)
@@ -61,24 +63,28 @@ def new_policy(name: str, priority: int, dir: str, force: bool):
     filepath = target_dir / file_name
 
     if filepath.exists() and not force:
-        click.secho(f"Error: File '{filepath}' already exists. Use --force to overwrite.", fg='red')
+        click.secho(
+            f"Error: File '{filepath}' already exists. Use --force to overwrite.",
+            fg="red",
+        )
         return
 
     content = POLICY_TEMPLATE.format(
         filepath=filepath,
         policy_name=name,
         priority=priority,
-        function_name=function_name
+        function_name=function_name,
     )
 
     try:
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(content)
-        click.secho(f"✓ Successfully created policy file at '{filepath}'", fg='green')
+        click.secho(f"✓ Successfully created policy file at '{filepath}'", fg="green")
     except IOError as e:
-        click.secho(f"Error: Could not write to file '{filepath}'. Reason: {e}", fg='red')
+        click.secho(
+            f"Error: Could not write to file '{filepath}'. Reason: {e}", fg="red"
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
-

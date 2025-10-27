@@ -8,13 +8,7 @@ Note: This example uses fresh policy registries for each demo to avoid
 interference from previously registered policies.
 """
 
-from clearstone import (
-    create_context,
-    compose_and,
-    compose_or,
-    ALLOW,
-    BLOCK
-)
+from clearstone import create_context, compose_and, compose_or, ALLOW, BLOCK
 
 
 def example_1_compose_and():
@@ -34,15 +28,11 @@ def example_1_compose_and():
     strict_policy = compose_and(requires_admin, requires_verified_email)
 
     ctx_admin_verified = create_context(
-        "user1", "agent1",
-        role="admin",
-        email_verified=True
+        "user1", "agent1", role="admin", email_verified=True
     )
 
     ctx_admin_unverified = create_context(
-        "user2", "agent1",
-        role="admin",
-        email_verified=False
+        "user2", "agent1", role="admin", email_verified=False
     )
 
     decision1 = strict_policy(ctx_admin_verified)
@@ -68,21 +58,13 @@ def example_2_compose_or():
 
     flexible_policy = compose_or(is_admin, is_emergency)
 
-    ctx_regular_user = create_context(
-        "user1", "agent1",
-        role="user"
-    )
+    ctx_regular_user = create_context("user1", "agent1", role="user")
 
     ctx_emergency_user = create_context(
-        "user2", "agent1",
-        role="user",
-        emergency_mode=True
+        "user2", "agent1", role="user", emergency_mode=True
     )
 
-    ctx_admin = create_context(
-        "user3", "agent1",
-        role="admin"
-    )
+    ctx_admin = create_context("user3", "agent1", role="admin")
 
     decision1 = flexible_policy(ctx_regular_user)
     print(f"Regular User: {decision1.action.value}")
@@ -149,24 +131,15 @@ def example_4_token_limit_composition():
     combined = compose_and(check_token_limit, requires_special_permission)
 
     ctx_pass = create_context(
-        "user1", "agent1",
-        token_limit=5000,
-        tokens_used=3000,
-        special_permission=True
+        "user1", "agent1", token_limit=5000, tokens_used=3000, special_permission=True
     )
 
     ctx_fail_tokens = create_context(
-        "user2", "agent1",
-        token_limit=5000,
-        tokens_used=6000,
-        special_permission=True
+        "user2", "agent1", token_limit=5000, tokens_used=6000, special_permission=True
     )
 
     ctx_fail_permission = create_context(
-        "user3", "agent1",
-        token_limit=5000,
-        tokens_used=3000,
-        special_permission=False
+        "user3", "agent1", token_limit=5000, tokens_used=3000, special_permission=False
     )
 
     scenarios = [
@@ -234,4 +207,3 @@ if __name__ == "__main__":
     print("- compose_or: ANY policy can pass (first non-BLOCK wins)")
     print("- Compositions can be nested for complex logic")
     print("- Works seamlessly with pre-built library policies")
-

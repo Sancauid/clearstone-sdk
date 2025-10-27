@@ -1,2 +1,1 @@
 # clearstone/cli/formatters.py
-

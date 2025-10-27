@@ -7,7 +7,13 @@ safe, performant, and deterministic before deploying them to production.
 
 import random
 import time
-from clearstone import PolicyValidator, PolicyValidationError, ALLOW, BLOCK, create_context
+from clearstone import (
+    PolicyValidator,
+    PolicyValidationError,
+    ALLOW,
+    BLOCK,
+    create_context,
+)
 
 
 def example_1_good_policy():
@@ -132,11 +138,7 @@ def example_6_custom_validation_context():
             return BLOCK("Admin blocked")
         return ALLOW
 
-    custom_context = create_context(
-        "test_user",
-        "test_agent",
-        role="admin"
-    )
+    custom_context = create_context("test_user", "test_agent", role="admin")
 
     validator = PolicyValidator(default_context=custom_context)
     failures = validator.run_all_checks(role_based_policy)
@@ -194,6 +196,7 @@ if __name__ == "__main__":
     print("\nKey Takeaways:")
     print("- Validate determinism: Policies should return same output for same input")
     print("- Validate performance: Policies should execute within time budgets")
-    print("- Validate exception safety: Policies should handle missing metadata gracefully")
+    print(
+        "- Validate exception safety: Policies should handle missing metadata gracefully"
+    )
     print("- Use run_all_checks() for comprehensive pre-deployment validation")
-
