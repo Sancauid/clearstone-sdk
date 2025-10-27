@@ -10,6 +10,7 @@ from typing import Callable, List
 
 from clearstone.core.actions import Decision
 from clearstone.core.context import PolicyContext, create_context
+from clearstone.utils.telemetry import get_telemetry_manager
 
 
 class PolicyValidationError(AssertionError):
@@ -44,6 +45,10 @@ class PolicyValidator:
             user_id="validation_user",
             agent_id="validation_agent",
             session_id="validation_session",
+        )
+
+        get_telemetry_manager().record_event(
+            "component_initialized", {"name": "PolicyValidator"}
         )
 
     def validate_determinism(

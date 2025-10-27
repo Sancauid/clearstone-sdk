@@ -683,6 +683,52 @@ See `examples/16_local_llm_protection.py` for a complete demonstration.
 
 ---
 
+## Anonymous Usage Telemetry
+
+To help improve Clearstone, the SDK collects anonymous usage statistics by default. This telemetry is:
+
+- **Anonymous:** Only component initialization events are tracked (e.g., "PolicyEngine initialized")
+- **Non-Identifying:** No user data, policy logic, or trace content is ever collected
+- **Transparent:** All telemetry code is open source and auditable
+- **Opt-Out:** Easy to disable at any time
+
+### What We Collect
+
+- Component initialization events (PolicyEngine, TracerProvider, etc.)
+- SDK version and Python version
+- Anonymous session ID (generated per-process)
+- Anonymous user ID (persistent, stored in `~/.clearstone/config.json`)
+
+### What We DON'T Collect
+
+- Your policy logic or decisions
+- Trace data or agent outputs
+- User identifiers or credentials
+- Any personally identifiable information (PII)
+- File paths or environment variables
+
+### How to Opt Out
+
+**Option 1: Environment Variable (Recommended)**
+```bash
+export CLEARSTONE_TELEMETRY_DISABLED=1
+```
+
+**Option 2: Config File**
+
+Edit or create `~/.clearstone/config.json`:
+```json
+{
+  "telemetry": {
+    "disabled": true
+  }
+}
+```
+
+The SDK checks for opt-out on every process start and respects your choice immediately.
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, set up a development environment, and run tests.

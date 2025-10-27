@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 from clearstone.core.actions import Decision
 from clearstone.core.context import PolicyContext
+from clearstone.utils.telemetry import get_telemetry_manager
 
 
 class PolicyDebugger:
@@ -20,6 +21,12 @@ class PolicyDebugger:
         decision, trace = debugger.trace_evaluation(my_policy, context)
         print(debugger.format_trace(my_policy, decision, trace))
     """
+
+    def __init__(self):
+        """Initializes the PolicyDebugger."""
+        get_telemetry_manager().record_event(
+            "component_initialized", {"name": "PolicyDebugger"}
+        )
 
     def trace_evaluation(
         self, policy: Callable[[PolicyContext], Decision], context: PolicyContext

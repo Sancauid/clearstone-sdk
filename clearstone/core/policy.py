@@ -9,6 +9,7 @@ from clearstone.core.actions import ALLOW, BLOCK, ActionType, Decision
 from clearstone.core.context import PolicyContext, get_current_context
 from clearstone.utils.audit import AuditTrail
 from clearstone.utils.metrics import PolicyMetrics
+from clearstone.utils.telemetry import get_telemetry_manager
 
 _policy_registry: List["PolicyInfo"] = []
 
@@ -95,6 +96,10 @@ class PolicyEngine:
         self._policies = policies
         self.audit_trail = audit_trail or AuditTrail()
         self.metrics = metrics or PolicyMetrics()
+
+        get_telemetry_manager().record_event(
+            "component_initialized", {"name": "PolicyEngine"}
+        )
 
     def evaluate(self, context: Optional[PolicyContext] = None) -> Decision:
         """
