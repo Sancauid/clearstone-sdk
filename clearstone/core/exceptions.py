@@ -1,0 +1,2 @@
+# clearstone/core/exceptions.py
+
