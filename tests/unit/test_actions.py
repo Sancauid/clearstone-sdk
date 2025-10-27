@@ -1,16 +1,18 @@
 # tests/unit/test_actions.py
 
+from dataclasses import FrozenInstanceError, is_dataclass
+
 import pytest
-from dataclasses import is_dataclass, FrozenInstanceError
+
 from clearstone.core.actions import (
+    ALERT,
+    ALLOW,
+    BLOCK,
+    PAUSE,
+    REDACT,
+    SKIP,
     ActionType,
     Decision,
-    ALLOW,
-    PAUSE,
-    ALERT,
-    SKIP,
-    BLOCK,
-    REDACT,
 )
 
 

@@ -7,11 +7,12 @@ safe, performant, and deterministic before deploying them to production.
 
 import random
 import time
+
 from clearstone import (
-    PolicyValidator,
-    PolicyValidationError,
     ALLOW,
     BLOCK,
+    PolicyValidationError,
+    PolicyValidator,
     create_context,
 )
 

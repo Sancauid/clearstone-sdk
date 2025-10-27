@@ -3,8 +3,9 @@ Tests for PolicyMetrics.
 """
 
 import pytest
+
+from clearstone.core.actions import ALERT, ALLOW, BLOCK
 from clearstone.utils.metrics import PolicyMetrics
-from clearstone.core.actions import ALLOW, BLOCK, ALERT
 
 
 class TestPolicyMetrics:

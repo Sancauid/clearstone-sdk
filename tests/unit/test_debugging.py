@@ -2,10 +2,9 @@
 Tests for policy debugger.
 """
 
-import pytest
-from clearstone.utils.debugging import PolicyDebugger
 from clearstone.core.actions import ALLOW, BLOCK
 from clearstone.core.context import create_context
+from clearstone.utils.debugging import PolicyDebugger
 
 
 def branching_policy(context):

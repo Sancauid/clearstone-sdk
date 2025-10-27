@@ -8,7 +8,7 @@ Note: This example uses fresh policy registries for each demo to avoid
 interference from previously registered policies.
 """
 
-from clearstone import create_context, compose_and, compose_or, ALLOW, BLOCK
+from clearstone import ALLOW, BLOCK, compose_and, compose_or, create_context
 
 
 def example_1_compose_and():

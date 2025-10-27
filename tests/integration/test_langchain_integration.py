@@ -1,14 +1,15 @@
 # tests/integration/test_langchain_integration.py
 
 import pytest
+
+from clearstone.core.actions import ALLOW, BLOCK, PAUSE
+from clearstone.core.context import PolicyContext, context_scope, create_context
+from clearstone.core.policy import Policy, PolicyEngine, reset_policies
 from clearstone.integrations.langchain.callbacks import (
     PolicyCallbackHandler,
-    PolicyViolationError,
     PolicyPauseError,
+    PolicyViolationError,
 )
-from clearstone.core.policy import Policy, PolicyEngine, reset_policies
-from clearstone.core.context import create_context, context_scope, PolicyContext
-from clearstone.core.actions import ALLOW, BLOCK, PAUSE
 
 
 @pytest.fixture(autouse=True)
@@ -84,7 +85,7 @@ def test_handler_pauses_on_pause_decision():
     ctx = create_context("user1", "agent1")
 
     with context_scope(ctx):
-        with pytest.raises(PolicyPauseError) as exc_info:
+        with pytest.raises(PolicyPauseError):
             handler.on_tool_start({"name": "deploy_to_prod"}, "v1.2.3")
 
 

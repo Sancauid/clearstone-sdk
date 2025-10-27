@@ -2,10 +2,9 @@
 Tests for policy composition utilities.
 """
 
-import pytest
-from clearstone.utils.composition import compose_and, compose_or
-from clearstone.core.actions import ALLOW, BLOCK, ALERT, PAUSE, ActionType
+from clearstone.core.actions import ALERT, ALLOW, BLOCK, PAUSE, ActionType
 from clearstone.core.context import create_context
+from clearstone.utils.composition import compose_and, compose_or
 
 
 def policy_allow(context):

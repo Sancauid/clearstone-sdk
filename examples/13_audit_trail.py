@@ -6,13 +6,13 @@ and export policy evaluation history.
 """
 
 from clearstone import (
-    Policy,
-    PolicyEngine,
-    AuditTrail,
-    create_context,
-    context_scope,
     ALLOW,
     BLOCK,
+    AuditTrail,
+    Policy,
+    PolicyEngine,
+    context_scope,
+    create_context,
 )
 from clearstone.core.policy import reset_policies
 
@@ -81,7 +81,7 @@ def example_2_audit_summary():
             print(f"  {status} Transaction {i}: ${amount} - {decision.action.value}")
 
     summary = audit.summary()
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Total decisions: {summary['total_decisions']}")
     print(f"  Blocks: {summary['blocks']}")
     print(f"  Block rate: {summary['block_rate']:.1%}")

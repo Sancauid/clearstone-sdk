@@ -3,7 +3,7 @@ Policy composition utilities for combining multiple policies with logical operat
 """
 
 from typing import Callable
-from clearstone.core.policy import Policy
+
 from clearstone.core.actions import ALLOW, BLOCK, ActionType, Decision
 from clearstone.core.context import PolicyContext
 

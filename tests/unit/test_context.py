@@ -1,14 +1,16 @@
 # tests/unit/test_context.py
 
-import pytest
 import asyncio
 from dataclasses import FrozenInstanceError
+
+import pytest
+
 from clearstone.core.context import (
     PolicyContext,
-    get_current_context,
-    set_current_context,
     context_scope,
     create_context,
+    get_current_context,
+    set_current_context,
 )
 
 

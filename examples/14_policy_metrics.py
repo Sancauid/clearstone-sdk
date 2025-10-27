@@ -5,18 +5,19 @@ This example demonstrates how to use PolicyMetrics to track and analyze
 policy performance, identify bottlenecks, and understand decision patterns.
 """
 
+import time
+
 from clearstone import (
+    ALERT,
+    ALLOW,
+    BLOCK,
     Policy,
     PolicyEngine,
     PolicyMetrics,
-    create_context,
     context_scope,
-    ALLOW,
-    BLOCK,
-    ALERT,
+    create_context,
 )
 from clearstone.core.policy import reset_policies
-import time
 
 
 def example_1_basic_metrics():
@@ -190,7 +191,7 @@ def example_4_shared_metrics_across_engines():
 
     # Get combined metrics
     summary = shared_metrics.summary()
-    print(f"\nShared metrics across both engines:")
+    print("\nShared metrics across both engines:")
     print(f"  Total evaluations: {summary['shared_policy']['eval_count']}")
     print(f"  Total blocks: {summary['shared_policy']['block_count']}")
     print(f"  Avg latency: {summary['shared_policy']['avg_latency_ms']:.4f}ms")

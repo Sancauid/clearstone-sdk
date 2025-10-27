@@ -1,9 +1,9 @@
 # tests/unit/test_intervention.py
 
-import pytest
 from unittest.mock import patch
-from clearstone.utils.intervention import InterventionClient
+
 from clearstone.core.actions import PAUSE
+from clearstone.utils.intervention import InterventionClient
 
 
 def test_intervention_client_request_intervention():

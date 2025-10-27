@@ -3,8 +3,9 @@ Policy performance and decision metrics collector.
 """
 
 from collections import defaultdict
-from typing import Dict, Any, List
-from clearstone.core.actions import Decision, ActionType
+from typing import Any, Dict, List
+
+from clearstone.core.actions import ActionType, Decision
 
 
 class PolicyMetrics:

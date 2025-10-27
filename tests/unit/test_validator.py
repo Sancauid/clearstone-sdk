@@ -2,12 +2,14 @@
 Tests for policy validator.
 """
 
-import pytest
 import random
 import time
-from clearstone.utils.validator import PolicyValidator, PolicyValidationError
+
+import pytest
+
 from clearstone.core.actions import ALLOW, BLOCK
 from clearstone.core.context import create_context
+from clearstone.utils.validator import PolicyValidationError, PolicyValidator
 
 
 def good_policy(context):

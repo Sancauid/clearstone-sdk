@@ -3,6 +3,7 @@
 import sys
 import threading
 from typing import Dict
+
 from clearstone.core.actions import Decision
 
 _pending_interventions: Dict[str, Dict] = {}
@@ -57,7 +58,7 @@ class InterventionClient:
             prompt or f"Approve action for intervention '{intervention_id}'? (yes/no): "
         )
 
-        print(f"\n--- ⏸️ HUMAN INTERVENTION REQUIRED ---")
+        print("\n--- ⏸️ HUMAN INTERVENTION REQUIRED ---")
         print(f"  Reason: {intervention['reason']}")
 
         try:

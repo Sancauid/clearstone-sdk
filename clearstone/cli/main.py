@@ -2,9 +2,9 @@
 Command-line interface for Clearstone SDK.
 """
 
-import click
 from pathlib import Path
 
+import click
 
 POLICY_TEMPLATE = """\
 # {filepath}
@@ -15,11 +15,11 @@ from clearstone.core.context import PolicyContext
 def {function_name}(context: PolicyContext) -> Decision:
     \"\"\"
     [TODO: Describe what this policy does.]
-    
+
     Required Metadata:
         - [TODO: List the context.metadata keys this policy needs.]
     \"\"\"
-    
+
     # [TODO: Implement your policy logic here.]
     # Example:
     # role = context.metadata.get("role")

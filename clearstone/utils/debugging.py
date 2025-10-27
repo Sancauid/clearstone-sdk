@@ -2,11 +2,12 @@
 Policy debugging tools for tracing execution and understanding policy decisions.
 """
 
-import sys
 import inspect
-from typing import Callable, List, Dict, Any, Tuple
-from clearstone.core.context import PolicyContext
+import sys
+from typing import Any, Callable, Dict, List, Tuple
+
 from clearstone.core.actions import Decision
+from clearstone.core.context import PolicyContext
 
 
 class PolicyDebugger:

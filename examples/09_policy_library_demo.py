@@ -5,12 +5,8 @@ This example demonstrates how to use Clearstone's pre-built policy library
 for common governance scenarios without writing custom policies.
 """
 
-from clearstone import PolicyEngine, create_context, context_scope
+from clearstone import PolicyEngine, context_scope, create_context
 from clearstone.policies import (
-    token_limit_policy,
-    rbac_tool_access_policy,
-    block_dangerous_tools_policy,
-    redact_pii_policy,
     create_cost_control_policies,
     create_security_policies,
 )

@@ -1,16 +1,16 @@
 # clearstone/integrations/langchain/callbacks.py
 
 import dataclasses
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 try:
     from langchain_core.callbacks.base import BaseCallbackHandler
 except ImportError:
     from langchain.callbacks.base import BaseCallbackHandler
 
-from clearstone.core.policy import PolicyEngine
-from clearstone.core.context import PolicyContext, get_current_context, context_scope
 from clearstone.core.actions import ActionType, Decision
+from clearstone.core.context import PolicyContext, context_scope, get_current_context
+from clearstone.core.policy import PolicyEngine
 
 
 class PolicyViolationError(Exception):

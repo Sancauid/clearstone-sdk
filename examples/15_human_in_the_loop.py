@@ -1,16 +1,17 @@
 # examples/15_human_in_the_loop.py
 import dataclasses
+
 from clearstone import (
-    Policy,
-    PolicyEngine,
-    create_context,
-    context_scope,
     ALLOW,
     PAUSE,
     InterventionClient,
+    Policy,
+    PolicyEngine,
+    context_scope,
+    create_context,
 )
-from clearstone.integrations.langchain import PolicyCallbackHandler, PolicyPauseError
 from clearstone.core.policy import reset_policies
+from clearstone.integrations.langchain import PolicyCallbackHandler, PolicyPauseError
 
 reset_policies()
 

@@ -1,0 +1,58 @@
+# mkdocs.yml
+
+site_name: Clearstone SDK
+site_url: https://your-repo.github.io/clearstone-sdk/
+repo_url: https://github.com/your-repo/clearstone-sdk
+repo_name: your-repo/clearstone-sdk
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/favicon.ico
+  palette:
+    - scheme: default
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - toc:
+      permalink: true
+
+nav:
+  - 'Home': 'index.md'
+  - 'User Guide':
+    - 'Getting Started': 'guide/getting-started.md'
+    - 'Writing Policies': 'guide/writing-policies.md'
+    - 'Using the Toolkit': 'guide/developer-toolkit.md'
+  - 'API Reference': 'api/index.md'
+  - 'About':
+    - 'Contributing': 'about/contributing.md'
+    - 'License': 'about/license.md'
+

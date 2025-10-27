@@ -4,8 +4,9 @@ import inspect
 import time
 from dataclasses import dataclass
 from typing import Callable, List, Optional
+
+from clearstone.core.actions import ALLOW, BLOCK, ActionType, Decision
 from clearstone.core.context import PolicyContext, get_current_context
-from clearstone.core.actions import Decision, ALLOW, BLOCK, ActionType
 from clearstone.utils.audit import AuditTrail
 from clearstone.utils.metrics import PolicyMetrics
 

@@ -1,12 +1,11 @@
 # manual_test.py
 
 import sys
-from typing import List, Any
-from langchain_core.callbacks.manager import CallbackManager
+from typing import Any, List
 
 # --- Import everything we need from our SDK ---
-from clearstone.core.actions import ALLOW, BLOCK, ALERT, Decision, ActionType
-from clearstone.core.context import create_context, context_scope
+from clearstone.core.actions import ALLOW, BLOCK, ActionType, Decision
+from clearstone.core.context import context_scope, create_context
 from clearstone.core.policy import Policy, PolicyEngine, reset_policies
 from clearstone.integrations.langchain.callbacks import (
     PolicyCallbackHandler,

@@ -5,7 +5,7 @@ This example demonstrates how to integrate Clearstone policies with LangChain
 agents using the PolicyCallbackHandler.
 """
 
-from clearstone import Policy, PolicyEngine, create_context, context_scope, ALLOW, BLOCK
+from clearstone import ALLOW, BLOCK, Policy, PolicyEngine, context_scope, create_context
 from clearstone.integrations.langchain import (
     PolicyCallbackHandler,
     PolicyViolationError,

@@ -5,7 +5,7 @@ This example demonstrates how to use PolicyDebugger to trace policy execution
 and understand the decision-making process line by line.
 """
 
-from clearstone import PolicyDebugger, ALLOW, BLOCK, create_context
+from clearstone import ALLOW, BLOCK, PolicyDebugger, create_context
 
 
 def example_1_simple_trace():
@@ -135,7 +135,7 @@ def example_4_debugging_workflow():
         if decision.reason:
             print(f"  Reason: {decision.reason}")
 
-        print(f"  Execution path:")
+        print("  Execution path:")
         for event in trace:
             locals_str = ", ".join([f"{k}={v}" for k, v in event["locals"].items()])
             print(f"    L{event['line_no']}: {event['line_text']}")

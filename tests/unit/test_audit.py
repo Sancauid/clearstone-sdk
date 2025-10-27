@@ -2,12 +2,12 @@
 Tests for audit trail functionality.
 """
 
-import pytest
-import json
 import csv
-from clearstone.utils.audit import AuditTrail
-from clearstone.core.actions import ALLOW, BLOCK, ALERT
+import json
+
+from clearstone.core.actions import ALERT, ALLOW, BLOCK
 from clearstone.core.context import create_context
+from clearstone.utils.audit import AuditTrail
 
 
 class TestAuditTrail:

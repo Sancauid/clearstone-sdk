@@ -10,11 +10,20 @@ This module provides battle-tested policies for:
 - Time-Based Restrictions
 """
 
-from typing import List, Tuple, Callable
 from datetime import datetime
-from clearstone.core.policy import Policy, PolicyInfo
+from typing import Callable, List
+
+from clearstone.core.actions import (
+    ALERT,
+    ALLOW,
+    BLOCK,
+    PAUSE,
+    REDACT,
+    ActionType,
+    Decision,
+)
 from clearstone.core.context import PolicyContext
-from clearstone.core.actions import Decision, ALLOW, BLOCK, PAUSE, ALERT, REDACT
+from clearstone.core.policy import Policy
 
 
 @Policy(name="token_limit", priority=100)
@@ -275,7 +284,7 @@ def alert_on_privileged_access_policy(context: PolicyContext) -> Decision:
     user_id = context.user_id
 
     if tool_name in privileged:
-        return ALERT
+        return Decision(ActionType.ALERT, reason=f"Privileged access: User '{user_id}' accessed '{tool_name}'.")
     return ALLOW
 
 
@@ -300,7 +309,7 @@ def alert_on_failed_auth_policy(context: PolicyContext) -> Decision:
         user_id = context.user_id
 
         if attempts > 3:
-            return ALERT
+            return Decision(ActionType.ALERT, reason=f"Security: {attempts} failed auth attempts for user '{user_id}'.")
 
     return ALLOW
 

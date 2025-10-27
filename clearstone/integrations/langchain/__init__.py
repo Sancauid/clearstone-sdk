@@ -4,8 +4,8 @@ LangChain integration for Clearstone SDK.
 
 from clearstone.integrations.langchain.callbacks import (
     PolicyCallbackHandler,
-    PolicyViolationError,
     PolicyPauseError,
+    PolicyViolationError,
 )
 
 __all__ = [

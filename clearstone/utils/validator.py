@@ -6,10 +6,10 @@ and deterministic before deploying them to production.
 """
 
 import timeit
-import random
 from typing import Callable, List
-from clearstone.core.context import PolicyContext, create_context
+
 from clearstone.core.actions import Decision
+from clearstone.core.context import PolicyContext, create_context
 
 
 class PolicyValidationError(AssertionError):

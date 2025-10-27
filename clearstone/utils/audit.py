@@ -5,9 +5,10 @@ Audit trail utilities for capturing and analyzing policy decisions.
 import csv
 import json
 from datetime import datetime, timezone
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+from clearstone.core.actions import ActionType, Decision
 from clearstone.core.context import PolicyContext
-from clearstone.core.actions import Decision, ActionType
 
 
 class AuditTrail:

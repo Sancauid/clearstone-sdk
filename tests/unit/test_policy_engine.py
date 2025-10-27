@@ -1,9 +1,10 @@
 # tests/unit/test_policy_engine.py
 
 import pytest
-from clearstone.core.policy import Policy, PolicyEngine, reset_policies, get_policies
-from clearstone.core.context import create_context, context_scope, set_current_context
-from clearstone.core.actions import ALLOW, BLOCK, PAUSE, ALERT, REDACT, ActionType
+
+from clearstone.core.actions import ALERT, ALLOW, BLOCK, PAUSE, ActionType
+from clearstone.core.context import context_scope, create_context, set_current_context
+from clearstone.core.policy import Policy, PolicyEngine, get_policies, reset_policies
 
 
 @pytest.fixture(autouse=True)
