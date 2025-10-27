@@ -288,7 +288,10 @@ def alert_on_privileged_access_policy(context: PolicyContext) -> Decision:
     user_id = context.user_id
 
     if tool_name in privileged:
-        return Decision(ActionType.ALERT, reason=f"Privileged access: User '{user_id}' accessed '{tool_name}'.")
+        return Decision(
+            ActionType.ALERT,
+            reason=f"Privileged access: User '{user_id}' accessed '{tool_name}'.",
+        )
     return ALLOW
 
 
@@ -313,7 +316,10 @@ def alert_on_failed_auth_policy(context: PolicyContext) -> Decision:
         user_id = context.user_id
 
         if attempts > 3:
-            return Decision(ActionType.ALERT, reason=f"Security: {attempts} failed auth attempts for user '{user_id}'.")
+            return Decision(
+                ActionType.ALERT,
+                reason=f"Security: {attempts} failed auth attempts for user '{user_id}'.",
+            )
 
     return ALLOW
 
@@ -534,6 +540,7 @@ def create_data_protection_policies() -> List[Callable]:
 # LOCAL SYSTEM & PERFORMANCE POLICIES
 # ============================================================================
 
+
 @Policy(name="system_load_protection", priority=200)
 def system_load_policy(context: PolicyContext) -> Decision:
     """
@@ -551,10 +558,14 @@ def system_load_policy(context: PolicyContext) -> Decision:
     memory_percent = psutil.virtual_memory().percent
 
     if cpu_percent > cpu_threshold:
-        return BLOCK(f"System CPU load is critical ({cpu_percent:.1f}%). Action blocked to prevent overload.")
+        return BLOCK(
+            f"System CPU load is critical ({cpu_percent:.1f}%). Action blocked to prevent overload."
+        )
 
     if memory_percent > mem_threshold:
-        return BLOCK(f"System memory usage is critical ({memory_percent:.1f}%). Action blocked.")
+        return BLOCK(
+            f"System memory usage is critical ({memory_percent:.1f}%). Action blocked."
+        )
 
     return ALLOW
 

@@ -1,12 +1,12 @@
 # clearstone/storage/sqlite.py
 
+import json
+import queue
 import sqlite3
 import threading
 import time
-import queue
-import json
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
 
 from clearstone.observability.models import Span, Trace
 
@@ -32,20 +32,26 @@ CREATE INDEX IF NOT EXISTS idx_spans_trace_id ON spans(trace_id);
 CREATE INDEX IF NOT EXISTS idx_spans_start_time ON spans(start_time_ns);
 """
 
+
 class SpanBuffer:
     """
     An in-memory, thread-safe buffer for spans that flushes them to a writer
     periodically or when the buffer is full. This decouples span creation
     from the I/O of writing to disk.
     """
-    def __init__(self, writer: 'TraceStore', batch_size: int = 100, flush_interval_s: int = 5):
+
+    def __init__(
+        self, writer: "TraceStore", batch_size: int = 100, flush_interval_s: int = 5
+    ):
         self._queue = queue.Queue()
         self._writer = writer
         self._batch_size = batch_size
         self._flush_interval_s = flush_interval_s
         self._shutdown = threading.Event()
-        
-        self._flusher_thread = threading.Thread(target=self._periodic_flush, daemon=True)
+
+        self._flusher_thread = threading.Thread(
+            target=self._periodic_flush, daemon=True
+        )
         self._flusher_thread.start()
 
     def add_span(self, span: Span):
@@ -60,7 +66,7 @@ class SpanBuffer:
         while not self._shutdown.is_set():
             time.sleep(self._flush_interval_s)
             self._flush_queue()
-    
+
     def _flush_queue(self):
         """Drains the queue and writes spans in batches."""
         spans_to_write = []
@@ -70,7 +76,7 @@ class SpanBuffer:
                 spans_to_write.append(span)
             except queue.Empty:
                 break
-        
+
         if spans_to_write:
             self._writer.write_spans(spans_to_write)
 
@@ -84,11 +90,13 @@ class SpanBuffer:
         self.flush()
         self._flusher_thread.join()
 
+
 class TraceStore:
     """
     Manages the persistence of traces to a local SQLite database.
     This class handles database connections, schema creation, and writing data.
     """
+
     def __init__(self, db_path: str = "clearstone_traces.db"):
         self.db_path = Path(db_path)
         self._conn = None
@@ -120,17 +128,28 @@ class TraceStore:
                 cursor = conn.cursor()
                 values = []
                 for span in spans:
-                    values.append((
-                        span.span_id, span.trace_id, span.parent_span_id, span.name,
-                        span.kind.value, span.start_time_ns, span.end_time_ns,
-                        span.status.value, json.dumps(span.attributes),
-                        json.dumps(span.input_snapshot), json.dumps(span.output_snapshot),
-                        span.error_message, span.instrumentation_name, span.instrumentation_version
-                    ))
-                
+                    values.append(
+                        (
+                            span.span_id,
+                            span.trace_id,
+                            span.parent_span_id,
+                            span.name,
+                            span.kind.value,
+                            span.start_time_ns,
+                            span.end_time_ns,
+                            span.status.value,
+                            json.dumps(span.attributes),
+                            json.dumps(span.input_snapshot),
+                            json.dumps(span.output_snapshot),
+                            span.error_message,
+                            span.instrumentation_name,
+                            span.instrumentation_version,
+                        )
+                    )
+
                 cursor.executemany(
                     "INSERT OR REPLACE INTO spans VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                    values
+                    values,
                 )
         finally:
             conn.close()
@@ -142,22 +161,39 @@ class TraceStore:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM spans WHERE trace_id = ?", (trace_id,))
             rows = cursor.fetchall()
-            
+
             if not rows:
                 return None
 
             spans = []
             for row in rows:
-                spans.append(Span(
-                    span_id=row[0], trace_id=row[1], parent_span_id=row[2], name=row[3],
-                    kind=row[4], start_time_ns=row[5], end_time_ns=row[6], status=row[7],
-                    attributes=json.loads(row[8] or '{}'),
-                    input_snapshot=json.loads(row[9] or 'null'),
-                    output_snapshot=json.loads(row[10] or 'null'),
-                    error_message=row[11], instrumentation_name=row[12], instrumentation_version=row[13]
-                ))
+                spans.append(
+                    Span(
+                        span_id=row[0],
+                        trace_id=row[1],
+                        parent_span_id=row[2],
+                        name=row[3],
+                        kind=row[4],
+                        start_time_ns=row[5],
+                        end_time_ns=row[6],
+                        status=row[7],
+                        attributes=json.loads(row[8] or "{}"),
+                        input_snapshot=json.loads(row[9] or "null"),
+                        output_snapshot=json.loads(row[10] or "null"),
+                        error_message=row[11],
+                        instrumentation_name=row[12],
+                        instrumentation_version=row[13],
+                    )
+                )
 
-            return Trace(trace_id=trace_id, spans=spans, root_span_id="", agent_id="", agent_version="", environment="", start_time_ns=0)
+            return Trace(
+                trace_id=trace_id,
+                spans=spans,
+                root_span_id="",
+                agent_id="",
+                agent_version="",
+                environment="",
+                start_time_ns=0,
+            )
         finally:
             conn.close()
-

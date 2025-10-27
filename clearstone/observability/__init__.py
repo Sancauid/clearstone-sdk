@@ -2,22 +2,22 @@
 
 from clearstone.observability.models import (
     Span,
-    Trace,
-    SpanKind,
-    SpanStatus,
     SpanEvent,
+    SpanKind,
     SpanLink,
-)
-from clearstone.observability.tracer import (
-    Tracer,
-    SpanContextManager,
-    get_tracer,
-    reset_tracer_registry,
+    SpanStatus,
+    Trace,
 )
 from clearstone.observability.provider import (
     TracerProvider,
     get_tracer_provider,
     reset_tracer_provider,
+)
+from clearstone.observability.tracer import (
+    SpanContextManager,
+    Tracer,
+    get_tracer,
+    reset_tracer_registry,
 )
 
 __all__ = [
@@ -35,4 +35,3 @@ __all__ = [
     "get_tracer_provider",
     "reset_tracer_provider",
 ]
-

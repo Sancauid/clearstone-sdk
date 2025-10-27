@@ -2,4 +2,3 @@
 from .hybrid import HybridSerializer, SelectiveSnapshotCapture
 
 __all__ = ["HybridSerializer", "SelectiveSnapshotCapture"]
-
