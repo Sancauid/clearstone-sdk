@@ -11,7 +11,7 @@ from threading import Lock
 from typing import Any, Dict, Optional
 from urllib import request
 
-TELEMETRY_ENDPOINT = "https://telemetry.clearstone.dev/event"
+TELEMETRY_ENDPOINT = "https://muddy-bread-02e3.telemetry-clearstone.workers.dev/event"
 CONFIG_DIR = Path.home() / ".clearstone"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 SESSION_ID = f"sess_{uuid.uuid4().hex}"
