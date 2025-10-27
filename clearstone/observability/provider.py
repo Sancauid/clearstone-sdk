@@ -5,6 +5,7 @@ from threading import Lock
 from typing import Dict, Optional
 
 from ..storage.sqlite import SpanBuffer, TraceStore
+from ..utils.telemetry import get_telemetry_manager
 from .tracer import Tracer
 
 
@@ -22,6 +23,10 @@ class TracerProvider:
         self.span_buffer = SpanBuffer(writer=self.trace_store)
 
         atexit.register(self.shutdown)
+
+        get_telemetry_manager().record_event(
+            "component_initialized", {"name": "TracerProvider"}
+        )
 
     def get_tracer(self, name: str, version: str = "0.1.0") -> Tracer:
         """
