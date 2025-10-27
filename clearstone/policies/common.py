@@ -8,10 +8,14 @@ This module provides battle-tested policies for:
 - Dangerous Operation Prevention
 - Security Alerts
 - Time-Based Restrictions
+- Local System & Performance
 """
 
 from datetime import datetime
 from typing import Callable, List
+
+import psutil
+import requests
 
 from clearstone.core.actions import (
     ALERT,
@@ -524,3 +528,71 @@ def create_data_protection_policies() -> List[Callable]:
         block_pii_tools_policy,
         admin_only_action_policy,
     ]
+
+
+# ============================================================================
+# LOCAL SYSTEM & PERFORMANCE POLICIES
+# ============================================================================
+
+@Policy(name="system_load_protection", priority=200)
+def system_load_policy(context: PolicyContext) -> Decision:
+    """
+    Blocks new, intensive actions if the local system's CPU or memory is overloaded.
+    This is a critical guardrail for users running local LLMs to prevent system freezes.
+
+    Required Metadata:
+        - cpu_threshold_percent (optional, default 90): CPU usage percent to trigger block.
+        - memory_threshold_percent (optional, default 95): Memory usage percent to trigger block.
+    """
+    cpu_threshold = context.metadata.get("cpu_threshold_percent", 90.0)
+    mem_threshold = context.metadata.get("memory_threshold_percent", 95.0)
+
+    cpu_percent = psutil.cpu_percent()
+    memory_percent = psutil.virtual_memory().percent
+
+    if cpu_percent > cpu_threshold:
+        return BLOCK(f"System CPU load is critical ({cpu_percent:.1f}%). Action blocked to prevent overload.")
+
+    if memory_percent > mem_threshold:
+        return BLOCK(f"System memory usage is critical ({memory_percent:.1f}%). Action blocked.")
+
+    return ALLOW
+
+
+@Policy(name="local_model_health_check", priority=190)
+def model_health_check_policy(context: PolicyContext) -> Decision:
+    """
+    Performs a quick health check on a local model server endpoint
+    before allowing an LLM call to proceed.
+
+    This prevents wasted time and retry loops when a local model server
+    (Ollama, LM Studio, etc.) is down or unhealthy.
+
+    Required Metadata:
+        - local_model_health_url (optional): Health check endpoint URL.
+          Default: "http://localhost:11434/api/tags" (Ollama default)
+        - health_check_timeout (optional): Timeout in seconds. Default: 0.5
+
+    Example:
+        metadata = {
+            "local_model_health_url": "http://localhost:11434/api/tags",
+            "health_check_timeout": 1.0
+        }
+    """
+    health_check_url = context.metadata.get(
+        "local_model_health_url", "http://localhost:11434/api/tags"
+    )
+    timeout = context.metadata.get("health_check_timeout", 0.5)
+
+    try:
+        response = requests.head(health_check_url, timeout=timeout)
+        if response.status_code != 200:
+            return BLOCK(
+                f"Local model server at {health_check_url} is unhealthy (status: {response.status_code})."
+            )
+    except requests.exceptions.RequestException as e:
+        return BLOCK(
+            f"Local model server at {health_check_url} is unreachable. Error: {type(e).__name__}"
+        )
+
+    return ALLOW
