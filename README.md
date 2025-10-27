@@ -46,6 +46,14 @@ Clearstone provides the tools to manage these risks with declarative Policy-as-C
 *   ✅ **Hybrid Serialization:** Smart JSON-first serialization with automatic pickle fallback for complex objects.
 *   ✅ **Single-Line Setup:** Initialize the entire tracing system with one `TracerProvider` instantiation.
 
+### AI-Native Testing & Backtesting
+*   ✅ **Behavioral Assertions:** Declarative test functions for validating agent behavior (tool usage, execution order, costs, errors).
+*   ✅ **Historical Backtesting:** Test new policies against real production traces to predict impact before deployment.
+*   ✅ **Policy Test Harness:** Simulate policy enforcement on historical data with detailed impact reports and metrics.
+*   ✅ **pytest Integration:** Seamlessly integrate behavioral tests into existing test workflows and CI/CD pipelines.
+*   ✅ **Trace-Level Validation:** Assert on complete execution flows, not just individual operations or outputs.
+*   ✅ **Comprehensive Reporting:** Track block rates, decision distributions, and identify problematic traces.
+
 ## Installation
 
 The SDK requires Python 3.10+.
@@ -341,6 +349,148 @@ with tracer.span("risky_operation") as span:
 - 🔄 **Batched writes:** Groups 100 spans per transaction
 - 🔒 **Thread-safe:** Multiple threads can trace concurrently
 - 💾 **Efficient storage:** SQLite with WAL mode for concurrent reads
+
+## AI-Native Testing & Backtesting
+
+Clearstone provides a powerful testing framework designed specifically for AI agents. Unlike traditional unit tests that check outputs, this framework validates **how** agents behave.
+
+#### Quick Start: Test Agent Behavior
+
+```python
+from clearstone.observability import TracerProvider
+from clearstone.testing import PolicyTestHarness, assert_tool_was_called, assert_no_errors_in_trace
+
+# Step 1: Run your agent with tracing enabled
+provider = TracerProvider(db_path="agent_traces.db")
+tracer = provider.get_tracer("research_agent")
+
+with tracer.span("research_workflow"):
+    with tracer.span("search", attributes={"tool.name": "web_search"}):
+        pass  # Your agent's search logic here
+
+provider.shutdown()
+
+# Step 2: Create behavioral assertions
+harness = PolicyTestHarness("agent_traces.db")
+traces = harness.load_traces()
+
+# Step 3: Validate behavior
+tool_check = assert_tool_was_called("web_search", times=1)
+error_check = assert_no_errors_in_trace()
+
+results = [
+    harness.simulate_policy(tool_check, traces),
+    harness.simulate_policy(error_check, traces)
+]
+
+# Step 4: Check results
+for result in results:
+    summary = result.summary()
+    if summary["runs_blocked"] > 0:
+        print(f"❌ Test failed: {result.policy_name}")
+        print(f"   Blocked traces: {result.blocked_trace_ids}")
+    else:
+        print(f"✅ Test passed: {result.policy_name}")
+```
+
+#### Available Behavioral Assertions
+
+**Tool Usage Validation**
+```python
+from clearstone.testing import assert_tool_was_called
+
+# Assert tool was called at least once
+policy = assert_tool_was_called("calculator")
+
+# Assert exact number of calls
+policy = assert_tool_was_called("web_search", times=3)
+```
+
+**Cost Control Testing**
+```python
+from clearstone.testing import assert_llm_cost_is_less_than
+
+# Ensure agent stays within budget
+policy = assert_llm_cost_is_less_than(0.50)  # Max $0.50 per run
+```
+
+**Error Detection**
+```python
+from clearstone.testing import assert_no_errors_in_trace
+
+# Validate error-free execution
+policy = assert_no_errors_in_trace()
+```
+
+**Execution Flow Validation**
+```python
+from clearstone.testing import assert_span_order
+
+# Ensure correct workflow sequence
+policy = assert_span_order(["plan", "search", "synthesize"])
+```
+
+#### Historical Backtesting
+
+Test policy changes against production data before deployment:
+
+```python
+from clearstone.testing import PolicyTestHarness
+
+# Load 100 historical traces from production
+harness = PolicyTestHarness("production_traces.db")
+traces = harness.load_traces(limit=100)
+
+# Test a new policy against historical data
+def new_cost_policy(trace):
+    total_cost = sum(s.attributes.get("cost", 0) for s in trace.spans)
+    if total_cost > 2.0:
+        return BLOCK("Cost exceeds new limit")
+    return ALLOW
+
+# See impact before deploying
+result = harness.simulate_policy(new_cost_policy, traces)
+summary = result.summary()
+
+print(f"Would block: {summary['runs_blocked']} / {summary['traces_analyzed']} runs")
+print(f"Block rate: {summary['block_rate_percent']}")
+```
+
+#### pytest Integration
+
+Integrate behavioral tests seamlessly into your test suite:
+
+```python
+# tests/test_agent_behavior.py
+import pytest
+from clearstone.observability import TracerProvider
+from clearstone.testing import PolicyTestHarness, assert_tool_was_called
+
+def test_research_agent_uses_search_correctly(tmp_path):
+    db_path = tmp_path / "test_traces.db"
+    
+    # Run agent
+    provider = TracerProvider(db_path=str(db_path))
+    tracer = provider.get_tracer("test_agent")
+    run_research_agent(tracer)  # Your agent function
+    provider.shutdown()
+    
+    # Test behavior
+    harness = PolicyTestHarness(str(db_path))
+    traces = harness.load_traces()
+    
+    policy = assert_tool_was_called("search", times=2)
+    result = harness.simulate_policy(policy, traces)
+    
+    assert result.summary()["runs_blocked"] == 0, "Agent should use search exactly twice"
+```
+
+**Key Benefits:**
+- 🎯 **Behavior-Focused:** Test what agents *do*, not just what they *return*
+- 📊 **Data-Driven:** Validate against real execution traces
+- 🔄 **Regression Prevention:** Catch behavioral changes before deployment
+- 🧪 **CI/CD Ready:** Seamlessly integrates with pytest workflows
+- 📈 **Impact Analysis:** Understand policy changes with detailed metrics
 
 ## Command-Line Interface (CLI)
 
