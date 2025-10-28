@@ -8,17 +8,27 @@ from clearstone.observability.models import (
     SpanStatus,
     Trace,
 )
-from clearstone.observability.provider import (
-    TracerProvider,
-    get_tracer_provider,
-    reset_tracer_provider,
-)
 from clearstone.observability.tracer import (
     SpanContextManager,
     Tracer,
     get_tracer,
     reset_tracer_registry,
 )
+
+
+def __getattr__(name):
+    """Lazy import of provider to avoid circular dependency."""
+    if name in ("TracerProvider", "get_tracer_provider", "reset_tracer_provider"):
+        from clearstone.observability.provider import (
+            TracerProvider,
+            get_tracer_provider,
+            reset_tracer_provider,
+        )
+
+        globals()[name] = locals()[name]
+        return locals()[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "Span",

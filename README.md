@@ -59,6 +59,8 @@ Clearstone provides the tools to manage these risks with declarative Policy-as-C
 *   ✅ **Agent Rehydration:** Dynamically restore agents from checkpoints with full state preservation.
 *   ✅ **Deterministic Replay:** Mock non-deterministic functions (time, random) for reproducible debugging sessions.
 *   ✅ **Interactive Debugging:** Drop into pdb at any historical execution point with full context.
+*   ✅ **Pre-flight Mock Analysis:** See exactly which functions will be mocked and how many responses were recorded before debugging.
+*   ✅ **Intelligent Error Handling:** Clear error messages when mock data is insufficient, with actionable guidance.
 *   ✅ **Hybrid Serialization:** JSON metadata with pickle state for human-readable yet high-fidelity checkpoints.
 *   ✅ **Upstream Span Tracking:** Automatically capture parent span hierarchy for complete execution context.
 

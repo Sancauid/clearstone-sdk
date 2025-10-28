@@ -4,7 +4,11 @@ import atexit
 from threading import Lock
 from typing import Dict, Optional
 
+# Import the concrete implementations for instantiation
 from ..storage.sqlite import SpanBuffer, TraceStore
+
+# Import the abstract base classes for type hinting
+from ..storage.types import BaseSpanBuffer, BaseTraceStore
 from ..utils.telemetry import get_telemetry_manager
 from .tracer import Tracer
 
@@ -19,8 +23,9 @@ class TracerProvider:
         self._tracers: Dict[str, Tracer] = {}
         self._lock = Lock()
 
-        self.trace_store = TraceStore(db_path=db_path)
-        self.span_buffer = SpanBuffer(writer=self.trace_store)
+        # Instantiation uses the concrete classes
+        self.trace_store: BaseTraceStore = TraceStore(db_path=db_path)
+        self.span_buffer: BaseSpanBuffer = SpanBuffer(writer=self.trace_store)
 
         atexit.register(self.shutdown)
 
