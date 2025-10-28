@@ -76,6 +76,9 @@ nav:
     - 'Testing': 'guide/testing.md'
     - 'Time-Travel Debugging': 'guide/time-travel-debugging.md'
   - 'Pre-Built Policies': 'policies.md'
+  - 'Architecture':
+    - 'Overview': 'architecture/overview.md'
+    - 'Design Philosophy': 'architecture/design-philosophy.md'
   - 'API Reference':
     - 'Governance API': 'api/governance.md'
     - 'Observability API': 'api/observability.md'

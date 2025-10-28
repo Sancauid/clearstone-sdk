@@ -51,9 +51,9 @@ def Policy(name: str, priority: int = 0) -> Callable:
             )
 
         info = PolicyInfo(name=name, priority=priority, func=func)
-        
+
         func._policy_info = info
-        
+
         _policy_registry.append(info)
         return func
 
@@ -127,15 +127,15 @@ class PolicyEngine:
         # It ensures that even explicitly passed policies are handled correctly.
         policy_infos = []
         for func in policy_funcs:
-            if hasattr(func, '_policy_info'):
+            if hasattr(func, "_policy_info"):
                 policy_infos.append(func._policy_info)
             else:
                 # Handle the case where a non-decorated function is passed.
                 # We can either raise an error or assign default metadata.
                 # Assigning defaults is more user-friendly.
-                name = getattr(func, '__name__', 'anonymous_policy')
+                name = getattr(func, "__name__", "anonymous_policy")
                 policy_infos.append(PolicyInfo(name=name, priority=0, func=func))
-        
+
         self._policies = sorted(policy_infos, key=lambda p: p.priority, reverse=True)
 
     def _discover_policies(self):
