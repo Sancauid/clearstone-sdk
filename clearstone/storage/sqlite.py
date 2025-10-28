@@ -8,8 +8,9 @@ import time
 from pathlib import Path
 from typing import List, Optional
 
-from .types import BaseSpanBuffer, BaseTraceStore
 from clearstone.observability.models import Span, Trace
+
+from .types import BaseSpanBuffer, BaseTraceStore
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS spans (

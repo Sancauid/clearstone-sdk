@@ -19,7 +19,7 @@ from clearstone.observability.tracer import (
 def __getattr__(name):
     """Lazy import of provider to avoid circular dependency."""
     if name in ("TracerProvider", "get_tracer_provider", "reset_tracer_provider"):
-        from clearstone.observability.provider import (
+        from clearstone.observability.provider import (  # noqa: F401
             TracerProvider,
             get_tracer_provider,
             reset_tracer_provider,

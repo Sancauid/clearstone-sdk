@@ -126,8 +126,6 @@ class ReplayEngine:
         # Load ALL spans from the trace to find recorded outputs
         # This includes child spans that happen during replay
         if self.trace_store:
-            from clearstone.observability.models import Trace
-
             full_trace = self.trace_store.get_trace(self.checkpoint.trace_id)
             all_spans_in_trace = full_trace.spans
         else:
