@@ -200,7 +200,7 @@ Yes. Simply remove the environment variable or set `"disabled": false` in the co
 
 If you have questions or concerns about telemetry:
 
-- **GitHub Issues**: [Report Privacy Concerns](https://github.com/your-repo/clearstone-sdk/issues)
+- **GitHub Issues**: [Report Privacy Concerns](https://github.com/Sancauid/clearstone-sdk/issues)
 
 ## Changes to This Policy
 

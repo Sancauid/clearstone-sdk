@@ -19,6 +19,7 @@ from clearstone.integrations.langchain import (
 
 reset_policies()
 
+
 def simulate_local_llm_call(context):
     """Simulates an LLM call that would be expensive on local hardware."""
     engine = PolicyEngine()
@@ -26,27 +27,36 @@ def simulate_local_llm_call(context):
 
     print("\n🤖 Attempting LLM call...")
     print(f"   CPU Threshold: {context.metadata.get('cpu_threshold_percent', 90)}%")
-    print(f"   Memory Threshold: {context.metadata.get('memory_threshold_percent', 95)}%")
-    print(f"   Model Server: {context.metadata.get('local_model_health_url', 'http://localhost:11434/api/tags')}")
+    print(
+        f"   Memory Threshold: {context.metadata.get('memory_threshold_percent', 95)}%"
+    )
+    print(
+        f"   Model Server: {context.metadata.get('local_model_health_url', 'http://localhost:11434/api/tags')}"
+    )
 
     try:
         with context_scope(context):
-            handler.on_llm_start(serialized={"name": "local-llama"}, prompts=["Test prompt"])
+            handler.on_llm_start(
+                serialized={"name": "local-llama"}, prompts=["Test prompt"]
+            )
 
         print("✅ LLM call proceeded successfully!")
         return True
 
     except PolicyViolationError as e:
-        print(f"❌ LLM call blocked by policy: {e.decision.metadata.get('policy_name', 'unknown')}")
+        print(
+            f"❌ LLM call blocked by policy: {e.decision.metadata.get('policy_name', 'unknown')}"
+        )
         print(f"   Reason: {e.decision.reason}")
         return False
+
 
 if __name__ == "__main__":
     engine = PolicyEngine()
 
-    print("="*70)
+    print("=" * 70)
     print("DEMO: Local LLM Protection Policies")
-    print("="*70)
+    print("=" * 70)
 
     # Scenario 1: Normal operation - everything should work
     print("\n--- SCENARIO 1: Normal System Load & Healthy Server ---")
@@ -55,7 +65,7 @@ if __name__ == "__main__":
         "ollama-agent",
         cpu_threshold_percent=90.0,
         memory_threshold_percent=95.0,
-        local_model_health_url="http://localhost:11434/api/tags"
+        local_model_health_url="http://localhost:11434/api/tags",
     )
 
     print("\nℹ️  In a real scenario, system load would be checked automatically.")
@@ -74,19 +84,20 @@ if __name__ == "__main__":
     print("   the policy provides an immediate, clear error instead of a")
     print("   mysterious 60-second timeout.")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("KEY BENEFITS FOR LOCAL LLM USERS:")
-    print("="*70)
+    print("=" * 70)
     print("✅ Prevents system freezes from overload")
     print("✅ Immediate feedback when model server is down")
     print("✅ Avoids wasted time on doomed requests")
     print("✅ Protects against retry loops that make problems worse")
     print("✅ Specifically designed for local-first AI workflows")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("USAGE:")
-    print("="*70)
-    print("""
+    print("=" * 70)
+    print(
+        """
 from clearstone.policies.common import (
     system_load_policy,
     model_health_check_policy
@@ -108,5 +119,5 @@ context = create_context(
     local_model_health_url="http://localhost:11434/api/tags",
     health_check_timeout=1.0          # 1 second timeout
 )
-""")
-
+"""
+    )
