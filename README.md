@@ -1,9 +1,8 @@
 # Clearstone SDK
 
-[![PyPI Version](https://img.shields.io/pypi/v/clearstone-sdk.svg)](https://pypi.org/project/clearstone-sdk/)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/your-repo/your-workflow.yml?branch=main)](https://github.com/your-repo/clearstone-sdk/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python Version](https://img.shields.io/pypi/pyversions/clearstone-sdk.svg)](https://pypi.org/project/clearstone-sdk)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![GitHub Stars](https://img.shields.io/github/stars/Sancauid/clearstone-sdk?style=social)](https://github.com/Sancauid/clearstone-sdk)
 
 **Production-Grade Governance and Observability for AI Agent Systems.**
 
@@ -14,6 +13,7 @@ Clearstone is a comprehensive Python SDK that provides safety, governance, and o
 ## The Problem
 
 Autonomous AI agents are powerful but operate in a high-stakes environment. Without robust guardrails and observability, they can be:
+
 *   **Unsafe:** Accidentally executing destructive actions (e.g., deleting files).
 *   **Costly:** Over-using expensive tools or LLM tokens.
 *   **Non-compliant:** Mishandling sensitive data (PII).
@@ -736,3 +736,14 @@ Contributions are welcome! Please see our [Contributing Guide](CONTRIBUTING.md) 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Community & Support
+
+Join our community to ask questions, share your projects, and get help from the team and other users.
+
+*   **Discord:** [Join the Clearstone Community](https://discord.gg/VZAX4vk8dT)
+*   **Twitter:** Follow [@clearstonedev](https://twitter.com/clearstonedev) for the latest news and updates.
+*   **GitHub Issues:** [Report a bug or suggest a feature](https://github.com/Sancauid/clearstone-sdk/issues).
+*   **Email:** For other inquiries, you can reach out to [pablo@clearstone.dev](mailto:pablo@clearstone.dev).

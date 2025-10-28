@@ -1,6 +1,6 @@
 # Contributing to the Clearstone SDK
 
-We're thrilled you're interested in contributing to the Clearstone SDK! Your contributions help us build a more robust and reliable governance layer for the entire AI agent ecosystem. This document provides guidelines to ensure a smooth and effective contribution process.
+We're thrilled you're interested in contributing to the Clearstone SDK! Your contributions help us build a more robust and reliable toolkit for the entire AI agent ecosystem. This document provides guidelines to ensure a smooth and effective contribution process.
 
 ## How Can I Contribute?
 
@@ -40,34 +40,32 @@ To get started with the codebase, you'll need to set up a local development envi
 
 3.  **Install Dependencies**
 
-    Install the package in "editable" mode along with all development dependencies (like `pytest` and `click`). This allows you to edit the code and have the changes immediately reflected.
+    Install the package in "editable" mode along with all development dependencies (like `pytest`, `black`, and `ruff`). This allows you to edit the code and have the changes immediately reflected.
     ```bash
     pip install -e ".[dev]"
     ```
 
 4.  **Run the Test Suite**
 
-    Before making any changes, ensure that the existing test suite passes.
+    Before making any changes, ensure that the existing test suite passes. This is a crucial first step.
     ```bash
-    pytest -v
+    pytest
     ```
-    All tests should pass. If not, please open an issue or pull the latest changes from the `main` branch.
 
 ## Pull Request Process
 
-We follow a standard pull request workflow.
+We follow a standard, automated pull request workflow.
 
 1.  **Create a Feature Branch**
 
     Create a new branch from `main` for your changes. Please use a descriptive name.
     ```bash
-
     git checkout -b feature/my-new-policy-validator
     ```
 
 2.  **Make Your Changes**
 
-    Write your code! Follow the existing code style and structure.
+    Write your code! Follow the existing code style and structure. Remember to add docstrings and type hints.
 
 3.  **Add or Update Tests**
 
@@ -75,38 +73,44 @@ We follow a standard pull request workflow.
     *   Bug fixes should include a test that fails without the fix and passes with it.
     *   New features must have corresponding unit or integration tests.
 
-4.  **Ensure All Checks Pass**
+4.  **Format and Lint Your Code (CRITICAL STEP)**
 
-    Before submitting, run the full test suite one last time to ensure you haven't introduced any regressions.
+    Before committing, you must run our automated formatting and linting tools. Our CI pipeline will fail your pull request if this step is skipped.
     ```bash
-    pytest
+    # Automatically format all code to the project's style
+    black .
+
+    # Automatically fix any fixable linting errors
+    ruff check . --fix
+
+    # Check for any remaining, non-fixable errors
+    ruff check .
     ```
 
-5.  **Format and Lint Your Code**
+5.  **Ensure All Local Checks Pass**
 
-    We use standard tools to maintain code quality. Please run them before committing.
+    Run the full test suite one last time to ensure you haven't introduced any regressions.
     ```bash
-    # (Assuming you will add black and flake8/ruff to dev dependencies)
-    # black .
-    # flake8 .
+    pytest
     ```
 
 6.  **Submit the Pull Request**
 
     Push your branch to your fork and open a pull request against the `main` branch of the original repository.
+    *   Our GitHub Actions CI will automatically run all tests and style checks. All checks must pass before the PR can be merged.
     *   Use a clear and descriptive title (e.g., "feat: Add PolicyMetrics collector for observability").
     *   Provide a detailed description of the changes.
-    *   If your PR addresses an existing issue, link it using `Fixes #123` or `Resolves #123`.
+    *   If your PR addresses an existing issue, link it using `Fixes #123`.
 
 ## Coding Style Guide
 
-*   We follow the **PEP 8** style guide.
-*   We use **Black** for automated code formatting to ensure consistency.
+*   Our code style is enforced automatically by **Black** (for formatting) and **Ruff** (for linting).
+*   Please run `black .` and `ruff check . --fix` before committing your changes.
 *   Docstrings should follow the **Google Python Style Guide**.
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior.
+This project and everyone participating in it is governed by our Code of Conduct. By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
 
 ## License Agreement
 

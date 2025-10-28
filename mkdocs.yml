@@ -1,10 +1,13 @@
 # mkdocs.yml
 
 site_name: Clearstone SDK
-site_url: https://your-repo.github.io/clearstone-sdk/
-repo_url: https://github.com/your-repo/clearstone-sdk
-repo_name: your-repo/clearstone-sdk
+site_description: "The open-source reliability toolkit for AI agents. Add production-grade governance, observability, and debugging to any agent workflow."
+site_url: https://sancauid.github.io/clearstone-sdk/
+repo_url: https://github.com/Sancauid/clearstone-sdk
+repo_name: Sancauid/clearstone-sdk
 edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2025 Clearstone.dev
 
 theme:
   name: material
@@ -24,6 +27,7 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   features:
+    - navigation.instant
     - navigation.tabs
     - navigation.sections
     - navigation.top
@@ -32,8 +36,25 @@ theme:
     - content.code.copy
     - content.code.annotate
 
+extra:
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/Sancauid/clearstone-sdk
+    - icon: fontawesome/brands/x-twitter
+      link: https://twitter.com/clearstonedev
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/VZAX4vk8dT
+    - icon: fontawesome/solid/paper-plane
+      link: mailto:pablo@clearstone.dev
+
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            show_source: false
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -46,13 +67,22 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - 'Home': 'index.md'
+  - 'Overview': 'index.md'
+  - 'Getting Started': 'getting-started.md'
   - 'User Guide':
-    - 'Getting Started': 'guide/getting-started.md'
-    - 'Writing Policies': 'guide/writing-policies.md'
-    - 'Using the Toolkit': 'guide/developer-toolkit.md'
-  - 'API Reference': 'api/index.md'
+    - 'Core Concepts': 'guide/core-concepts.md'
+    - 'Governance': 'guide/governance.md'
+    - 'Observability': 'guide/observability.md'
+    - 'Testing': 'guide/testing.md'
+    - 'Time-Travel Debugging': 'guide/time-travel-debugging.md'
+  - 'Pre-Built Policies': 'policies.md'
+  - 'API Reference':
+    - 'Governance API': 'api/governance.md'
+    - 'Observability API': 'api/observability.md'
+    - 'Testing API': 'api/testing.md'
+    - 'Debugging API': 'api/debugging.md'
+    - 'Utilities API': 'api/utils.md'
   - 'About':
     - 'Contributing': 'about/contributing.md'
+    - 'Telemetry': 'about/telemetry.md'
     - 'License': 'about/license.md'
-

@@ -1,0 +1,9 @@
+# Assets Directory
+
+This directory contains assets for the documentation site:
+
+- `logo.svg`: Site logo (appears in navigation)
+- `favicon.ico`: Site favicon (appears in browser tab)
+
+Replace these with your actual logo and favicon files.
+
