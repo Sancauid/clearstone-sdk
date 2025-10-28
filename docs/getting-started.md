@@ -198,6 +198,6 @@ You've now created a policy-protected agent with full observability and testing!
 ## Getting Help
 
 - **Documentation**: You're reading it! Browse the sections in the navigation.
-- **GitHub Issues**: Report bugs or request features at [github.com/your-repo/clearstone-sdk](https://github.com/your-repo/clearstone-sdk)
+- **GitHub Issues**: Report bugs or request features at [github.com/Sancauid/clearstone-sdk](https://github.com/Sancauid/clearstone-sdk/issues)
 - **Examples**: Check out the `examples/` directory in the repository for more complete demonstrations.
 

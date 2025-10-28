@@ -6,8 +6,8 @@ We're thrilled you're interested in contributing to the Clearstone SDK! Your con
 
 There are many ways to contribute, and all are valuable. Here are a few ideas:
 
-*   🐛 **Reporting Bugs:** If you find a bug, please [open an issue](https://github.com/your-repo/clearstone-sdk/issues) and provide as much detail as possible, including steps to reproduce it.
-*   ✨ **Suggesting Enhancements:** Have an idea for a new feature, a pre-built policy, or an improvement to an existing one? We'd love to hear it. [Open an issue](https://github.com/your-repo/clearstone-sdk/issues) with the "enhancement" label.
+*   🐛 **Reporting Bugs:** If you find a bug, please [open an issue](https://github.com/Sancauid/clearstone-sdk/issues) and provide as much detail as possible, including steps to reproduce it.
+*   ✨ **Suggesting Enhancements:** Have an idea for a new feature, a pre-built policy, or an improvement to an existing one? We'd love to hear it. [Open an issue](https://github.com/Sancauid/clearstone-sdk/issues) with the "enhancement" label.
 *   📝 **Improving Documentation:** If you find parts of the documentation that are unclear, confusing, or incomplete, a pull request with improvements is highly appreciated.
 *   💻 **Contributing Code:** If you're ready to write some code, you can pick up an existing issue or propose a new feature of your own.
 

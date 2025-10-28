@@ -76,6 +76,7 @@ nav:
     - 'Testing': 'guide/testing.md'
     - 'Time-Travel Debugging': 'guide/time-travel-debugging.md'
   - 'Pre-Built Policies': 'policies.md'
+  - 'Join Waitlist': 'https://t.co/4geEAPFzXC'
   - 'API Reference':
     - 'Governance API': 'api/governance.md'
     - 'Observability API': 'api/observability.md'

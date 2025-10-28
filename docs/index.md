@@ -4,6 +4,8 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![GitHub Stars](https://img.shields.io/github/stars/Sancauid/clearstone-sdk?style=social)](https://github.com/Sancauid/clearstone-sdk)
 
+**[Join the Waitlist](https://t.co/4geEAPFzXC) for our upcoming cloud platform and enterprise features!**
+
 **Production-Grade Governance and Observability for AI Agent Systems.**
 
 Clearstone is a comprehensive Python SDK that provides safety, governance, and observability for multi-agent AI workflows. It combines declarative Policy-as-Code with OpenTelemetry-aligned distributed tracing to help you build reliable, debuggable, and compliant AI systems.
