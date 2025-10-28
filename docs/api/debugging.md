@@ -22,7 +22,8 @@ Restores agent state from checkpoints and enables interactive debugging.
 from clearstone.debugging import ReplayEngine
 
 checkpoint = manager.load_checkpoint("checkpoint.ckpt")
-engine = ReplayEngine(checkpoint)
+# Pass trace_store to access all spans in the trace
+engine = ReplayEngine(checkpoint, trace_store=provider.trace_store)
 ```
 
 ::: clearstone.debugging.replay.ReplayEngine

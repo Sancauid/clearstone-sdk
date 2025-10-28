@@ -76,7 +76,8 @@ from clearstone.debugging import ReplayEngine
 
 checkpoint = manager.load_checkpoint("t1_ckpt_abc123.ckpt")
 
-engine = ReplayEngine(checkpoint)
+# Pass the trace_store to access all spans in the trace
+engine = ReplayEngine(checkpoint, trace_store=provider.trace_store)
 
 result = engine.replay_from_checkpoint(
     function_name="process_next_step",
@@ -90,16 +91,39 @@ result = engine.replay_from_checkpoint(
 The `start_debugging_session` method drops you into an interactive `pdb` session with the restored agent state:
 
 ```python
-engine = ReplayEngine(checkpoint)
+# Pass trace_store to access all spans including child spans
+engine = ReplayEngine(checkpoint, trace_store=provider.trace_store)
+
+# Define how your trace data maps to your code
+mock_config = {
+    "llm": "my_app.tools.llm.invoke",
+    "tool": "my_app.tools.api.run_tool"
+}
 
 engine.start_debugging_session(
     function_to_replay="process_next_step",
+    mock_config=mock_config,
     input_data={"query": "test"}
 )
 ```
 
 **When you run this:**
 ```
+--- 🕰️ Welcome to the Clearstone Time-Travel Debugger ---
+  Trace ID: abc123
+  Checkpoint: ckpt_xyz (at span: 'process_step_2')
+  Agent State: Rehydrated for 'my_app.agent.MyAgent'
+
+Dropping into interactive debugger (pdb). Type 'c' to continue execution from the checkpoint.
+------------------------------------------------------------
+
+--- Pre-flight Mock Analysis ---
+  - Mocking 'my_app.tools.llm.invoke' (for span_type='llm')
+    - Found 3 recorded response(s) in the trace.
+  - Mocking 'my_app.tools.api.run_tool' (for span_type='tool')
+    - Found 2 recorded response(s) in the trace.
+------------------------------------------------------------
+
 > /path/to/agent.py(42)process_next_step()
 -> result = self.process(input_data)
 (Pdb) print(self.memory)
@@ -108,7 +132,19 @@ engine.start_debugging_session(
 > /path/to/agent.py(43)process_next_step()
 -> return result
 (Pdb) continue
+
+------------------------------------------------------------
+--- ✅ Replay finished. Final result: {'status': 'success'} ---
 ```
+
+**Pre-flight Mock Analysis**
+
+Before entering the debugger, the replay engine performs a pre-flight analysis:
+- Shows which functions will be mocked
+- Displays how many recorded responses were found for each function
+- Warns if no responses are found (preventing `StopIteration` errors)
+
+This makes debugging much easier by giving you visibility into what will happen during replay.
 
 ## Agent Requirements
 
@@ -167,7 +203,7 @@ When replaying from a checkpoint, these are automatically mocked:
 ```python
 import time
 
-time.time()
+time.time()  # Always returns checkpoint timestamp
 time.time_ns()
 datetime.datetime.now()
 ```
@@ -176,34 +212,73 @@ datetime.datetime.now()
 ```python
 import random
 
-random.random()
-random.randint(1, 10)
-random.choice([1, 2, 3])
+random.random()  # Always returns 0.5
 ```
 
-**LLM Responses:**
+### User-Specified Mock Targets
+
+The replay engine allows you to specify exactly which functions to mock and what values they should return. This is done through the `mock_config` parameter:
+
 ```python
-response = call_llm("prompt")
+from clearstone.debugging import ReplayEngine
+
+# Load checkpoint
+checkpoint = manager.load_checkpoint("checkpoint.ckpt")
+engine = ReplayEngine(checkpoint)
+
+# Map your trace's span types to your actual code paths
+mock_config = {
+    "llm": "my_app.tools.llm.invoke",           # LLM calls
+    "tool": "my_app.tools.api.run_tool",        # Tool executions
+    "database": "my_app.db.query"               # Database queries
+}
+
+# The replay engine automatically extracts recorded responses from the trace
+# and mocks these functions to return those values in order
+engine.start_debugging_session(
+    function_to_replay="process_step",
+    mock_config=mock_config,
+    input_data={"query": "test"}
+)
 ```
 
-### Custom Deterministic Values
+**How It Works:**
 
-Override mocked values:
+1. The replay engine scans the checkpoint's trace for spans matching the specified types (e.g., "llm", "tool")
+2. It extracts the recorded outputs from those spans in chronological order
+3. It patches the specified import paths to return those outputs sequentially
+4. Your agent's code calls the functions naturally, but gets deterministic responses
+
+**Error Handling:**
+
+If a mocked function is called more times than there are recorded responses, you'll see:
+
+```
+------------------------------------------------------------
+--- ❌ Replay Failed: StopIteration ---
+This usually means a mocked function was called more times than there were recorded responses in the trace.
+Please check the 'Pre-flight Mock Analysis' above to see how many responses were found.
+```
+
+This clear error message helps you quickly identify:
+- Which function ran out of responses
+- How many responses were expected vs. actual calls
+- Whether your mock configuration is correct
+
+### Direct Context Usage (Advanced)
+
+For more control, you can use `DeterministicExecutionContext` directly:
 
 ```python
 from clearstone.debugging import DeterministicExecutionContext
 
-context = DeterministicExecutionContext(
-    checkpoint=checkpoint,
-    fixed_time=1609459200.0,
-    fixed_random_seed=42,
-    replayed_llm_responses={
-        "prompt_1": "mocked_response_1",
-        "prompt_2": "mocked_response_2"
-    }
-)
+# Manually specify mock targets and their return values
+mock_targets = {
+    "my_app.llm.invoke": ["response1", "response2", "response3"],
+    "my_app.api.fetch": [{"data": "result1"}, {"data": "result2"}]
+}
 
-with context:
+with DeterministicExecutionContext(checkpoint, mock_targets):
     result = agent.run()
 ```
 
@@ -278,8 +353,14 @@ for item in checkpoint.agent_state["memory"]:
 
 engine = ReplayEngine(checkpoint)
 
+# Map trace span types to your agent's code
+mock_config = {
+    "llm": "research_agent.call_llm"  # Mock LLM calls
+}
+
 engine.start_debugging_session(
     function_to_replay="research",
+    mock_config=mock_config,
     query="What are AI alignment solutions?"
 )
 ```

@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.1.2] - 2025-01-15
+
+### ✨ Enhancements
+
+*   **Hardened ReplayEngine Mocking Logic:** The `ReplayEngine` now provides robust mock data collection with comprehensive error handling and improved debuggability. Key improvements include:
+    *   **Pre-flight Mock Analysis:** Displays detailed information about which functions will be mocked and how many recorded responses were found before debugging starts
+    *   **Full Trace Access:** Added `trace_store` parameter to access all spans in the trace, including child spans that were previously missed
+    *   **Intelligent Error Handling:** Clear error messages when mock data is insufficient, with actionable guidance for debugging
+    *   **Flexible Span Matching:** Enhanced span matching logic that supports name prefixes, custom attributes, and SpanKind enum values
+    *   **Graceful Deserialization:** Robust handling of deserialization failures with informative error placeholders
+
+### 🐛 Bug Fixes
+
+*   **Fixed Critical ReplayEngine Bug:** Resolved issue where the ReplayEngine only looked at upstream spans, missing child spans that contain recorded outputs. This caused "0 recorded responses" errors even when outputs were properly captured.
+
+### 📚 Documentation
+
+*   **Updated Time-Travel Debugging Guide:** Enhanced documentation with pre-flight analysis examples and error handling scenarios
+*   **Updated API Reference:** Added `trace_store` parameter documentation for `ReplayEngine` initialization
+
+---
+
 ## [0.1.1] - 2025-10-27
 
 ### ✨ Enhancements

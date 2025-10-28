@@ -10,6 +10,8 @@ from typing import List, Optional
 
 from clearstone.observability.models import Span, Trace
 
+from .types import BaseSpanBuffer, BaseTraceStore
+
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS spans (
     span_id TEXT PRIMARY KEY,
@@ -33,7 +35,7 @@ CREATE INDEX IF NOT EXISTS idx_spans_start_time ON spans(start_time_ns);
 """
 
 
-class SpanBuffer:
+class SpanBuffer(BaseSpanBuffer):
     """
     An in-memory, thread-safe buffer for spans that flushes them to a writer
     periodically or when the buffer is full. This decouples span creation
@@ -91,7 +93,7 @@ class SpanBuffer:
         self._flusher_thread.join()
 
 
-class TraceStore:
+class TraceStore(BaseTraceStore):
     """
     Manages the persistence of traces to a local SQLite database.
     This class handles database connections, schema creation, and writing data.
