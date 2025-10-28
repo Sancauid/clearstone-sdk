@@ -16,11 +16,38 @@ This page documents the complete API for Clearstone's governance system.
 
 The PolicyEngine discovers, evaluates, and enforces policies at runtime.
 
+### Initialization
+
 ```python
 from clearstone import PolicyEngine
 
+# Auto-discovery mode (default)
 engine = PolicyEngine()
+
+# Explicit configuration mode
+engine = PolicyEngine(policies=[policy1, policy2])
+
+# With audit trail and metrics
+from clearstone import AuditTrail, PolicyMetrics
+
+audit = AuditTrail()
+metrics = PolicyMetrics()
+engine = PolicyEngine(
+    policies=[policy1, policy2],  # Optional
+    audit_trail=audit,
+    metrics=metrics
+)
 ```
+
+**Parameters:**
+
+- `policies` (Optional[List[Callable]]): List of policy functions to use. If provided, only these policies will be evaluated (no auto-discovery). If None (default), all imported `@Policy`-decorated functions are discovered automatically.
+- `audit_trail` (Optional[AuditTrail]): Custom audit trail instance for logging decisions. If None, creates a new instance.
+- `metrics` (Optional[PolicyMetrics]): Custom metrics instance for tracking performance. If None, creates a new instance.
+
+**Raises:**
+
+- `ValueError`: If no valid policies are found (either through auto-discovery or explicit list)
 
 ## Pre-Built Policies
 

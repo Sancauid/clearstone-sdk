@@ -51,6 +51,9 @@ def Policy(name: str, priority: int = 0) -> Callable:
             )
 
         info = PolicyInfo(name=name, priority=priority, func=func)
+        
+        func._policy_info = info
+        
         _policy_registry.append(info)
         return func
 
@@ -73,33 +76,71 @@ class PolicyEngine:
     The central engine that evaluates registered policies against a given context.
 
     Args:
-        policies: Optional list of PolicyInfo objects. If None, uses all registered policies.
+        policies: An optional list of decorated policy functions to use.
+                  If provided, this exact list will be used, and auto-discovery
+                  of other policies will be skipped. If None (default), the engine
+                  will auto-discover all imported @Policy-decorated functions.
         audit_trail: Optional AuditTrail instance. If None, creates a new one.
         metrics: Optional PolicyMetrics instance. If None, creates a new one.
     """
 
     def __init__(
         self,
-        policies: Optional[List[PolicyInfo]] = None,
+        policies: Optional[List[Callable]] = None,
         audit_trail: Optional[AuditTrail] = None,
         metrics: Optional[PolicyMetrics] = None,
     ):
-        if policies is None:
-            policies = get_policies()
-
-        if not policies:
-            raise ValueError(
-                "PolicyEngine initialized with no policies. "
-                "Use the @Policy decorator to register at least one policy."
-            )
-
-        self._policies = policies
+        self._policies: List[PolicyInfo] = []
         self.audit_trail = audit_trail or AuditTrail()
         self.metrics = metrics or PolicyMetrics()
 
+        if policies is not None:
+            # --- Explicit Configuration Path ---
+            # If a list is provided, register ONLY those policies.
+            # We filter out any non-callable items for safety.
+            valid_policies = [p for p in policies if callable(p)]
+            self._register_policies(valid_policies)
+        else:
+            # --- Auto-Discovery Path (Backward-Compatible) ---
+            # Otherwise, fall back to the original auto-discovery logic.
+            self._discover_policies()
+
+        if not self._policies:
+            # This check is now universal for both paths.
+            raise ValueError(
+                "PolicyEngine initialized with no valid policies. "
+                "Either provide a list of policy functions or ensure @Policy-decorated "
+                "functions are imported."
+            )
+
+        # Record a telemetry event for initialization
         get_telemetry_manager().record_event(
             "component_initialized", {"name": "PolicyEngine"}
         )
+
+    def _register_policies(self, policy_funcs: List[Callable]):
+        """
+        Processes a list of decorated functions and adds them to the engine's active set,
+        sorted by priority.
+        """
+        # This logic re-uses the metadata attached by the @Policy decorator.
+        # It ensures that even explicitly passed policies are handled correctly.
+        policy_infos = []
+        for func in policy_funcs:
+            if hasattr(func, '_policy_info'):
+                policy_infos.append(func._policy_info)
+            else:
+                # Handle the case where a non-decorated function is passed.
+                # We can either raise an error or assign default metadata.
+                # Assigning defaults is more user-friendly.
+                name = getattr(func, '__name__', 'anonymous_policy')
+                policy_infos.append(PolicyInfo(name=name, priority=0, func=func))
+        
+        self._policies = sorted(policy_infos, key=lambda p: p.priority, reverse=True)
+
+    def _discover_policies(self):
+        """Auto-discovers all imported @Policy-decorated functions from the global registry."""
+        self._policies = sorted(get_policies(), key=lambda p: p.priority, reverse=True)
 
     def evaluate(self, context: Optional[PolicyContext] = None) -> Decision:
         """

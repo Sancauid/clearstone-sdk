@@ -57,7 +57,7 @@ def test_policy_decorator_raises_on_invalid_signature():
 
 def test_engine_raises_if_no_policies_registered():
     """Ensure PolicyEngine.__init__ raises an error if no policies exist."""
-    with pytest.raises(ValueError, match="initialized with no policies"):
+    with pytest.raises(ValueError, match="initialized with no valid policies"):
         PolicyEngine()
 
 
@@ -160,3 +160,53 @@ def test_engine_audit_trail():
     assert audit_trail[0]["decision"] == "allow"
     assert audit_trail[1]["policy_name"] == "p2"
     assert audit_trail[1]["decision"] == "alert"
+
+
+def test_engine_with_explicit_policies_list():
+    """Test that the engine uses ONLY the policies provided in the constructor."""
+    # These policies are defined but SHOULD NOT be auto-discovered
+    @Policy(name="should_be_ignored", priority=100)
+    def ignored_policy(context):
+        return BLOCK("This should not run")
+
+    # These are the policies we will explicitly pass
+    @Policy(name="explicit_policy_1", priority=10)
+    def explicit_1(context):
+        return ALLOW
+    
+    @Policy(name="explicit_policy_2", priority=20)
+    def explicit_2(context):
+        return ALLOW
+    
+    # Initialize the engine with an explicit list
+    engine = PolicyEngine(policies=[explicit_1, explicit_2])
+    
+    # Check that ONLY the explicit policies are loaded, and they are sorted
+    assert len(engine._policies) == 2
+    assert engine._policies[0].name == "explicit_policy_2"  # Higher priority first
+    assert engine._policies[1].name == "explicit_policy_1"
+
+
+def test_engine_with_explicit_empty_list_raises_error():
+    """Test that initializing with an empty list of policies raises a ValueError."""
+    with pytest.raises(ValueError, match="initialized with no valid policies"):
+        PolicyEngine(policies=[])
+
+
+def test_engine_auto_discovery_still_works_by_default():
+    """Test that calling PolicyEngine() with no args preserves auto-discovery."""
+    @Policy(name="auto_discovered_1")
+    def auto_1(context):
+        return ALLOW
+    
+    @Policy(name="auto_discovered_2")
+    def auto_2(context):
+        return ALLOW
+        
+    # Initialize with no arguments
+    engine = PolicyEngine()
+    
+    assert len(engine._policies) == 2
+    policy_names = {p.name for p in engine._policies}
+    assert "auto_discovered_1" in policy_names
+    assert "auto_discovered_2" in policy_names

@@ -16,6 +16,62 @@ engine = PolicyEngine()
 
 The engine automatically discovers all policies decorated with `@Policy` that have been imported into your application.
 
+### Configuration Modes
+
+The `PolicyEngine` supports two configuration modes:
+
+#### Auto-Discovery (Default)
+
+The engine automatically discovers all imported `@Policy`-decorated functions:
+
+```python
+from clearstone import PolicyEngine
+import my_policies  # Policies are auto-discovered
+
+engine = PolicyEngine()
+```
+
+This is the most convenient mode for most applications. Simply import your policy modules, and the engine will find and use them.
+
+#### Explicit Configuration
+
+Pass a specific list of policies to use only those policies:
+
+```python
+from clearstone import PolicyEngine, Policy, ALLOW, BLOCK
+
+@Policy(name="policy1", priority=10)
+def policy1(context):
+    return ALLOW
+
+@Policy(name="policy2", priority=20)
+def policy2(context):
+    return ALLOW
+
+# Use ONLY these two policies, ignore all others
+engine = PolicyEngine(policies=[policy1, policy2])
+```
+
+**When to use explicit configuration:**
+
+- **Multi-Environment Deployments:** Use different policy sets for development, staging, and production
+- **Testing Scenarios:** Isolate specific policies for unit testing without interference from others
+- **Multi-Tenant Applications:** Different tenants/customers need different policy sets
+- **Fine-Grained Control:** You have many policies defined but only want specific ones active
+- **Dynamic Policy Loading:** Load policies based on runtime configuration or feature flags
+
+**Example: Environment-Specific Policies**
+
+```python
+from clearstone import PolicyEngine
+from my_policies import strict_auth_policy, lenient_auth_policy, cost_policy
+
+if os.getenv("ENV") == "production":
+    engine = PolicyEngine(policies=[strict_auth_policy, cost_policy])
+else:
+    engine = PolicyEngine(policies=[lenient_auth_policy])
+```
+
 ### Evaluating Policies
 
 ```python
