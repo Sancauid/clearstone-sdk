@@ -164,7 +164,32 @@ Agent is attempting to access 'admin_panel' tool...
 
 Clearstone is more than just an engine; it's a complete toolkit for policy governance.
 
-#### 1. Composing Policies
+#### 1. Explicit Policy Configuration
+Control exactly which policies are active without relying on auto-discovery.
+```python
+from clearstone import PolicyEngine, Policy, ALLOW, BLOCK
+
+@Policy(name="strict_policy", priority=100)
+def strict_policy(context):
+    if context.metadata.get("strict_mode"):
+        return BLOCK("Strict mode enabled")
+    return ALLOW
+
+@Policy(name="lenient_policy", priority=100)
+def lenient_policy(context):
+    return ALLOW
+
+# Production: use only the strict policy
+prod_engine = PolicyEngine(policies=[strict_policy])
+
+# Development: use only the lenient policy
+dev_engine = PolicyEngine(policies=[lenient_policy])
+
+# Testing: isolate specific policies
+test_engine = PolicyEngine(policies=[strict_policy])
+```
+
+#### 2. Composing Policies
 Build complex logic from simple, reusable parts.
 ```python
 from clearstone import compose_and
@@ -174,7 +199,7 @@ from clearstone.policies.common import token_limit_policy, cost_limit_policy
 safe_and_cheap_policy = compose_and(token_limit_policy, cost_limit_policy)
 ```
 
-#### 2. Validating Policies Before Deployment
+#### 3. Validating Policies Before Deployment
 Catch bugs before they reach production. The validator checks for slowness, non-determinism, and fragility.
 ```python
 from clearstone import PolicyValidator
@@ -188,7 +213,7 @@ else:
     print("Policy is ready for production!")
 ```
 
-#### 3. Debugging Policy Decisions
+#### 4. Debugging Policy Decisions
 Understand *why* a policy made a specific decision with a line-by-line execution trace.
 ```python
 from clearstone import PolicyDebugger
@@ -200,7 +225,7 @@ decision, trace = debugger.trace_evaluation(my_complex_policy, context)
 print(debugger.format_trace(my_complex_policy, decision, trace))
 ```
 
-#### 4. Performance Monitoring
+#### 5. Performance Monitoring
 Track policy performance and identify bottlenecks with real-time metrics.
 ```python
 from clearstone import PolicyMetrics
@@ -223,7 +248,7 @@ for policy_name, stats in slowest:
 top_blockers = metrics.get_top_blocking_policies(top_n=5)
 ```
 
-#### 5. Human-in-the-Loop Interventions
+#### 6. Human-in-the-Loop Interventions
 Pause agent execution for manual approval on high-stakes operations like financial transactions or destructive actions.
 ```python
 import dataclasses
@@ -275,7 +300,7 @@ ctx = create_context("user-1", "finance-agent", amount=2500)
 run_transaction(engine, ctx)
 ```
 
-#### 6. Auditing and Exporting
+#### 7. Auditing and Exporting
 The `PolicyEngine` automatically captures a detailed audit trail. You can analyze it or export it for compliance.
 ```python
 from clearstone import AuditTrail

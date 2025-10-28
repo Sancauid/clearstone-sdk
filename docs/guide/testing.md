@@ -271,6 +271,85 @@ def test_tool_usage_counts(tmp_path, tool_name, expected_count):
 
 Create your own assertions for specific needs.
 
+### Isolated Policy Testing
+
+Use explicit configuration to test policies in isolation without interference from other policies:
+
+```python
+import pytest
+from clearstone import PolicyEngine, Policy, BLOCK, ALLOW, create_context
+from clearstone.core.actions import ActionType
+
+@Policy(name="value_check_policy", priority=100)
+def value_check_policy(context):
+    """Ensure value doesn't exceed threshold."""
+    value = context.metadata.get("value", 0)
+    threshold = context.metadata.get("threshold", 10)
+    
+    if value > threshold:
+        return BLOCK(f"Value {value} exceeds threshold {threshold}")
+    
+    return ALLOW
+
+def test_value_check_policy_blocks_high_values():
+    """Test that the policy blocks values above threshold."""
+    # Test this policy in isolation, ignoring all other registered policies
+    engine = PolicyEngine(policies=[value_check_policy])
+    
+    context = create_context(
+        "user", "agent",
+        metadata={"value": 15, "threshold": 10}
+    )
+    
+    decision = engine.evaluate(context)
+    
+    assert decision.action == ActionType.BLOCK
+    assert "exceeds threshold" in decision.reason
+
+def test_value_check_policy_allows_low_values():
+    """Test that the policy allows values below threshold."""
+    engine = PolicyEngine(policies=[value_check_policy])
+    
+    context = create_context(
+        "user", "agent",
+        metadata={"value": 5, "threshold": 10}
+    )
+    
+    decision = engine.evaluate(context)
+    
+    assert decision.action == ActionType.ALLOW
+
+def test_multiple_policies_together():
+    """Test how multiple policies interact."""
+    @Policy(name="auth_check", priority=100)
+    def auth_check(context):
+        if not context.metadata.get("authenticated"):
+            return BLOCK("Not authenticated")
+        return ALLOW
+    
+    # Test specific combination of policies
+    engine = PolicyEngine(policies=[auth_check, value_check_policy])
+    
+    context = create_context(
+        "user", "agent",
+        metadata={"authenticated": False, "value": 5}
+    )
+    
+    decision = engine.evaluate(context)
+    
+    # Auth should block first (higher priority when both are 100)
+    assert decision.action == ActionType.BLOCK
+    assert "Not authenticated" in decision.reason
+```
+
+**Benefits of Isolated Testing:**
+
+- **No Side Effects:** Other policies don't interfere with your test
+- **Deterministic:** Test outcome depends only on the policy being tested
+- **Fast:** Only evaluates the policies you need
+- **Clear Failures:** Easy to identify which policy caused a test failure
+- **Flexible:** Mix and match policies to test specific combinations
+
 ### Basic Custom Assertion
 
 ```python
